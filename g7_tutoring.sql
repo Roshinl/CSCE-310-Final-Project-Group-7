@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Oct 31, 2022 at 08:33 PM
+-- Generation Time: Oct 31, 2022 at 08:51 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.0.1
 
@@ -28,10 +28,10 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `all_courses` (
-  `course_id` int(11) DEFAULT NULL,
+  `course_id` int(11) NOT NULL,
+  `student_id` int(11) DEFAULT NULL,
   `course_name` text,
-  `course_num` int(11) DEFAULT NULL,
-  `student_id` int(11) DEFAULT NULL
+  `course_num` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -41,7 +41,7 @@ CREATE TABLE `all_courses` (
 --
 
 CREATE TABLE `appointments` (
-  `app_id` int(11) DEFAULT NULL,
+  `app_id` int(11) NOT NULL,
   `course_id` int(11) DEFAULT NULL,
   `tutor_id` int(11) DEFAULT NULL,
   `date` date DEFAULT NULL,
@@ -56,7 +56,7 @@ CREATE TABLE `appointments` (
 --
 
 CREATE TABLE `comments` (
-  `comment_id` int(11) DEFAULT NULL,
+  `comment_id` int(11) NOT NULL,
   `student_id` int(11) DEFAULT NULL,
   `app_id` int(11) DEFAULT NULL,
   `time` time DEFAULT NULL,
@@ -71,7 +71,7 @@ CREATE TABLE `comments` (
 --
 
 CREATE TABLE `student` (
-  `student_id` int(11) DEFAULT NULL,
+  `student_id` int(11) NOT NULL,
   `student_fname` text,
   `student_lname` text
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -83,7 +83,7 @@ CREATE TABLE `student` (
 --
 
 CREATE TABLE `tutor` (
-  `tutor_id` int(11) DEFAULT NULL,
+  `tutor_id` int(11) NOT NULL,
   `tutor_fname` text,
   `tutor_lname` text
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -95,9 +95,88 @@ CREATE TABLE `tutor` (
 --
 
 CREATE TABLE `tutor_course_bridge` (
-  `tutor_id` int(11) DEFAULT NULL,
-  `course_id` int(11) DEFAULT NULL
+  `bridge_id` int(11) NOT NULL,
+  `tutor_id` int(11) NOT NULL,
+  `course_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `all_courses`
+--
+ALTER TABLE `all_courses`
+  ADD PRIMARY KEY (`course_id`),
+  ADD KEY `student_id` (`student_id`);
+
+--
+-- Indexes for table `appointments`
+--
+ALTER TABLE `appointments`
+  ADD PRIMARY KEY (`app_id`),
+  ADD KEY `course_id` (`course_id`),
+  ADD KEY `tutor_id` (`tutor_id`);
+
+--
+-- Indexes for table `comments`
+--
+ALTER TABLE `comments`
+  ADD PRIMARY KEY (`comment_id`),
+  ADD KEY `student_id` (`student_id`),
+  ADD KEY `app_id` (`app_id`);
+
+--
+-- Indexes for table `student`
+--
+ALTER TABLE `student`
+  ADD PRIMARY KEY (`student_id`);
+
+--
+-- Indexes for table `tutor`
+--
+ALTER TABLE `tutor`
+  ADD PRIMARY KEY (`tutor_id`);
+
+--
+-- Indexes for table `tutor_course_bridge`
+--
+ALTER TABLE `tutor_course_bridge`
+  ADD PRIMARY KEY (`bridge_id`),
+  ADD KEY `tutor_id` (`tutor_id`),
+  ADD KEY `course_id` (`course_id`);
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `all_courses`
+--
+ALTER TABLE `all_courses`
+  ADD CONSTRAINT `all_courses_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `student` (`student_id`);
+
+--
+-- Constraints for table `appointments`
+--
+ALTER TABLE `appointments`
+  ADD CONSTRAINT `appointments_ibfk_1` FOREIGN KEY (`course_id`) REFERENCES `all_courses` (`course_id`),
+  ADD CONSTRAINT `appointments_ibfk_2` FOREIGN KEY (`tutor_id`) REFERENCES `tutor` (`tutor_id`);
+
+--
+-- Constraints for table `comments`
+--
+ALTER TABLE `comments`
+  ADD CONSTRAINT `comments_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `student` (`student_id`),
+  ADD CONSTRAINT `comments_ibfk_2` FOREIGN KEY (`app_id`) REFERENCES `appointments` (`app_id`);
+
+--
+-- Constraints for table `tutor_course_bridge`
+--
+ALTER TABLE `tutor_course_bridge`
+  ADD CONSTRAINT `tutor_course_bridge_ibfk_1` FOREIGN KEY (`tutor_id`) REFERENCES `tutor` (`tutor_id`),
+  ADD CONSTRAINT `tutor_course_bridge_ibfk_2` FOREIGN KEY (`course_id`) REFERENCES `all_courses` (`course_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
