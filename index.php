@@ -1,4 +1,6 @@
 <?php
+    //include_once('connection.php');
+
 	$str_browser_language = !empty($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? strtok(strip_tags($_SERVER['HTTP_ACCEPT_LANGUAGE']), ',') : '';
 	$str_browser_language = !empty($_GET['language']) ? $_GET['language'] : $str_browser_language;
 	switch (substr($str_browser_language, 0,2))
@@ -106,6 +108,54 @@
     <p class="text">Diese Seite auf: <?php echo $str_available_languages; ?></p>
 
 <?php endif; ?>
+
+<?php
+    echo "Started connection\n";
+    $dbhost = 'localhost';
+    $dbuser = 'root';
+    $dbpass = '123';
+    $dbname = 'g7_tutoring';
+    
+    //$conn = mysql_connect('localhost', 'root', '123');
+    $conn = new mysqli($dbhost, $dbuser, $dbpass, $dbname);
+
+    // if(! $conn ) {
+    //     echo "Couldn't connect";
+    //    die('Could not connect: ' . mysql_error());
+    // }
+    // else
+    // {
+    //     echo "Connected";
+    // }
+
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+    
+    echo "Connected successfully\n";
+    
+    $sql = 'INSERT INTO student '.
+       '(student_id, student_fname, student_lname) '.
+       'VALUES ( 123, "bob", "blah" )';
+       
+    // mysql_select_db('g7_tutoring');
+    // $retval = mysql_query( $sql, $conn );
+    
+    // if(! $retval ) {
+    //    die('Could not enter data: ' . mysql_error());
+    // }
+
+    if ($conn->query($sql) == TRUE) {
+        echo "Query worked\n";
+    }
+    else {
+        echo "failed with error: " . $sql . "<br>" . $conn->error;
+    }
+    
+    echo "Entered data successfully\n";
+    
+    $conn->close();
+?>
 
 </body>
 </html>
