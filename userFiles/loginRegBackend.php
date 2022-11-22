@@ -31,6 +31,7 @@ if (isset($_POST['register_user'])) {
 	$email = mysqli_real_escape_string($link, $_POST['email']);
 	
 	$error = False;
+	$errorMessage = "";
 	
 	$payload = "SELECT * FROM student WHERE student_username = '$username' OR student_email = '$email' LIMIT 1";
 	$execute = mysqli_query($link, $payload);
@@ -40,19 +41,20 @@ if (isset($_POST['register_user'])) {
 	{
 		if ($testUser['student_username'] == $username)
 		{
-			echo '<script type="text/javascript">
-		   window.onload = function () { alert("Sorry, this username already exists"); } 
-			</script>';	
+			$errorMessage .= "Sorry, this username already exists\\n";
 			$error = True;
 		}
 		if ($testUser['student_email'] == $email)
 		{
-			echo '<script type="text/javascript">
-		   window.onload = function () { alert("Sorry, this email already exists"); } 
-			</script>';	
+			$errorMessage .= "Sorry, this email already exists\\n";
 			$error = True;
 		}
 	}
+	
+	echo '<script type="text/javascript">
+		   window.onload = function () { alert("'.$errorMessage.'"); } 
+			</script>';
+	
 	if (!$error)
 	{
 		$payload = "INSERT INTO student (student_username, student_password, student_fname, student_lname, student_email) VALUES('$username',
