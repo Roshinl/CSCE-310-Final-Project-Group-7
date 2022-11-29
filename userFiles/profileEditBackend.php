@@ -20,13 +20,13 @@ if($link === false){
 
 $student_table = "";
 
-$payload = "SELECT student_id, student_fname, student_lname, student_username, student_password, student_email FROM student WHERE student_id = '".$_SESSION['student_id']."'";
+$payload = "SELECT user_id, user_fname, user_lname, username, password, email FROM user WHERE user_id = '".$_SESSION['user_id']."'";
 $result = mysqli_query($link, $payload);
 
 if (mysqli_num_rows($result) > 0) {
 	$row = mysqli_fetch_assoc($result);
-	$student_table .= "<table><tr><th>Student name</th><th>Student username</th><th>Student password</th><th>Student email</th></tr>";
-	$student_table .= "<tr><td>".$row["student_fname"]." ".$row["student_lname"]."</td><td>".$row["student_username"]."</td><td>".$row["student_password"]."</td><td>".$row["student_email"]."</td></tr>";
+	$student_table .= "<table><tr><th>Your name</th><th>Your username</th><th>Your password</th><th>Your email</th></tr>";
+	$student_table .= "<tr><td>".$row["user_fname"]." ".$row["user_lname"]."</td><td>".$row["username"]."</td><td>".$row["password"]."</td><td>".$row["email"]."</td></tr>";
 	$student_table .= "</table>";
 }
 else 
@@ -39,7 +39,7 @@ else
 
 $payment_table = "";
 
-$payload = "SELECT payment_id, card_type, card_num, CVV, zip_code, exp_date FROM payment_info WHERE student_id = '".$_SESSION['student_id']."'";
+$payload = "SELECT payment_id, card_type, card_num, CVV, zip_code, exp_date FROM payment_info WHERE user_id = '".$_SESSION['user_id']."'";
 $result = mysqli_query($link, $payload);
 
 if (mysqli_num_rows($result) > 0) {
@@ -57,46 +57,86 @@ else
 
 // DISPLAY PAYMENT IDS FOR DROP DOWN (DYNAMIC)
 
-$payload = "SELECT payment_id FROM payment_info WHERE student_id = '".$_SESSION['student_id']."'";
+$payload = "SELECT payment_id FROM payment_info WHERE user_id = '".$_SESSION['user_id']."'";
 $display_paymentID = mysqli_query($link, $payload);
 
 // CHANGING PROFILE FIELDS
 
 if (isset($_POST['edit_fname'])) {
 	$fname = mysqli_real_escape_string($link, $_POST['fname']);
-	$payload = "UPDATE student SET student_fname = '$fname' WHERE student_id = '".$_SESSION['student_id']."'";
+	$payload = "UPDATE user SET user_fname = '$fname' WHERE user_id = '".$_SESSION['user_id']."'";
 	$execute = mysqli_query($link, $payload);
 	header('Location: profileEdit.php');
 }
 
 if (isset($_POST['edit_lname'])) {
 	$lname = mysqli_real_escape_string($link, $_POST['lname']);
-	$payload = "UPDATE student SET student_lname = '$lname' WHERE student_id = '".$_SESSION['student_id']."'";
+	$payload = "UPDATE user SET user_lname = '$lname' WHERE user_id = '".$_SESSION['user_id']."'";
 	$execute = mysqli_query($link, $payload);
 	header('Location: profileEdit.php');
 }
 
 if (isset($_POST['edit_username'])) {
 	$username = mysqli_real_escape_string($link, $_POST['username']);
-	$payload = "UPDATE student SET student_username = '$username' WHERE student_id = '".$_SESSION['student_id']."'";
+	
+	$payload = "SELECT * FROM user WHERE username = '$username' LIMIT 1";
 	$execute = mysqli_query($link, $payload);
-	$_SESSION['username'] = $username;
-	header('Location: profileEdit.php');
+	$testUser = mysqli_fetch_assoc($execute);
+	
+	$errorMessage = "";
+
+	if ($testUser) 
+	{
+		if ($testUser['username'] == $username)
+		{
+			$errorMessage .= "Sorry, this username already exists\\n";
+			echo '<script type="text/javascript">
+		   window.onload = function () { alert("'.$errorMessage.'"); } 
+			</script>';
+		}
+	}
+	else
+	{
+		$payload = "UPDATE user SET username = '$username' WHERE user_id = '".$_SESSION['user_id']."'";
+		$execute = mysqli_query($link, $payload);
+		$_SESSION['username'] = $username;
+		header('Location: profileEdit.php');
+	}
 	
 }
 
 if (isset($_POST['edit_password'])) {
 	$password = mysqli_real_escape_string($link, $_POST['password']);
-	$payload = "UPDATE student SET student_password = '$password' WHERE student_id = '".$_SESSION['student_id']."'";
+	$payload = "UPDATE user SET password = '$password' WHERE user_id = '".$_SESSION['user_id']."'";
 	$execute = mysqli_query($link, $payload);
 	header('Location: profileEdit.php');
 }
 
 if (isset($_POST['edit_email'])) {
 	$email = mysqli_real_escape_string($link, $_POST['email']);
-	$payload = "UPDATE student SET student_email = '$email' WHERE student_id = '".$_SESSION['student_id']."'";
+	
+	$payload = "SELECT * FROM user WHERE email = '$email' LIMIT 1";
 	$execute = mysqli_query($link, $payload);
-	header('Location: profileEdit.php');
+	$testUser = mysqli_fetch_assoc($execute);
+	
+	$errorMessage = "";
+
+	if ($testUser) 
+	{
+		if ($testUser['email'] == $email)
+		{
+			$errorMessage .= "Sorry, this email already exists\\n";
+			echo '<script type="text/javascript">
+		   window.onload = function () { alert("'.$errorMessage.'"); } 
+			</script>';
+		}
+	}
+	else
+	{
+		$payload = "UPDATE user SET email = '$email' WHERE user_id = '".$_SESSION['user_id']."'";
+		$execute = mysqli_query($link, $payload);
+		header('Location: profileEdit.php');
+	}
 }
 
 // ADDING PAYMENT INFORMATION
@@ -148,7 +188,7 @@ if (isset($_POST['add_payment'])) {
 	
 	if (!$error)
 	{
-		$payload = "INSERT INTO payment_info (student_id, card_type, card_num, CVV, zip_code, exp_date) VALUES('".$_SESSION['student_id']."',
+		$payload = "INSERT INTO payment_info (user_id, card_type, card_num, CVV, zip_code, exp_date) VALUES('".$_SESSION['user_id']."',
 		'$card_type','$card_num','$cvv','$zip_code','$expiry')";
 
 		if (!mysqli_query($link, $payload))
@@ -168,13 +208,22 @@ if (isset($_POST['delete_payment_id'])) {
 	$payload = "DELETE FROM payment_info WHERE payment_id = '$to_delete_id'";
 	$execute = mysqli_query($link, $payload);
 	
+	$payload = "SELECT payment_id, card_type, card_num, CVV, zip_code, exp_date FROM payment_info WHERE user_id = '".$_SESSION['user_id']."'";
+	$result = mysqli_query($link, $payload);
+	
+	if (mysqli_num_rows($result) <= 0)
+	{
+		$payload = "UPDATE student SET has_payment = 0 WHERE user_id = '".$_SESSION['user_id']."'";
+		$execute = mysqli_query($link, $payload);
+	}
+	
 	header('Location: profileEdit.php');
 }
 
 // DELETING ACCOUNT
 
 if (isset($_POST['delete_account'])) {
-	$payload = "DELETE FROM student WHERE student_id = '".$_SESSION['student_id']."'";
+	$payload = "DELETE FROM user WHERE user_id = '".$_SESSION['user_id']."'";
 	$execute = mysqli_query($link, $payload);
 	
 	session_reset();
