@@ -33,18 +33,18 @@ if (isset($_POST['register_user'])) {
 	$error = False;
 	$errorMessage = "";
 	
-	$payload = "SELECT * FROM student WHERE student_username = '$username' OR student_email = '$email' LIMIT 1";
+	$payload = "SELECT * FROM user WHERE username = '$username' OR email = '$email' LIMIT 1";
 	$execute = mysqli_query($link, $payload);
 	$testUser = mysqli_fetch_assoc($execute);
 
 	if ($testUser) 
 	{
-		if ($testUser['student_username'] == $username)
+		if ($testUser['username'] == $username)
 		{
 			$errorMessage .= "Sorry, this username already exists\\n";
 			$error = True;
 		}
-		if ($testUser['student_email'] == $email)
+		if ($testUser['email'] == $email)
 		{
 			$errorMessage .= "Sorry, this email already exists\\n";
 			$error = True;
@@ -57,20 +57,20 @@ if (isset($_POST['register_user'])) {
 	
 	if (!$error)
 	{
-		$payload = "INSERT INTO student (student_username, student_password, student_fname, student_lname, student_email) VALUES('$username',
-		'$password','$fname','$lname','$email')";
+		$payload = "INSERT INTO user (username, password, user_fname, user_lname, email, is_tutor) VALUES('$username',
+		'$password','$fname','$lname','$email', 0)";
 		
 		if (!mysqli_query($link, $payload))
 		{
 			echo("Error description: " . mysqli_error($link));
 		}
 		
-		$payload = "SELECT student_id FROM student WHERE student_username = '$username'";
+		$payload = "SELECT user_id FROM user WHERE username = '$username'";
 		$execute = mysqli_query($link, $payload);
 		$result = mysqli_fetch_assoc($execute);
 		
 		$_SESSION['username'] = $username;
-		$_SESSION['student_id'] = $result["student_id"];
+		$_SESSION['user_id'] = $result["user_id"];
 		header('Location: userHomePage.php');
 	}
 }
@@ -79,14 +79,14 @@ if (isset($_POST['login_user'])) {
 	$username = mysqli_real_escape_string($link, $_POST['username']);
 	$password = mysqli_real_escape_string($link, $_POST['password']);
 	
-	$payload = "SELECT * FROM student WHERE student_username = '$username' AND student_password = '$password' LIMIT 1";
+	$payload = "SELECT * FROM user WHERE username = '$username' AND password = '$password' LIMIT 1";
 	$execute = mysqli_query($link, $payload);
 	$testUser = mysqli_fetch_assoc($execute);
 	
 	if ($testUser)
 	{
 		$_SESSION['username'] = $username;
-		$_SESSION['student_id'] = $testUser["student_id"];
+		$_SESSION['user_id'] = $testUser["user_id"];
 		header('Location: userHomePage.php');
 	}
 	else
