@@ -6,8 +6,12 @@ table, th, td {
   border: 1px solid;
 }
 </style>
+
 <body>
 <?php echo "<p>Logged in as: " . $_SESSION["username"] . "</p>";?>
+
+<!-- EDITING USER PROFILE AND DETAILS !-->
+
 <?php echo $student_table; ?>
 </br>
 <form method="post" action="profileEdit.php">
@@ -15,21 +19,25 @@ table, th, td {
 	<input type="text" required name="fname">
 	<button type="submit" class="btn" name="edit_fname">Submit</button>
 </form>
+
 <form method="post" action="profileEdit.php">
 	<label>Change your last name here</label>
 	<input type="text" required name="lname">
 	<button type="submit" class="btn" name="edit_lname">Submit</button>
 </form>
+
 <form method="post" action="profileEdit.php">
 	<label>Change your username here</label>
 	<input type="text" required name="username">
 	<button type="submit" class="btn" name="edit_username">Submit</button>
 </form>
+
 <form method="post" action="profileEdit.php">
 	<label>Change your password here</label>
 	<input type="text" required name="password">
 	<button type="submit" class="btn" name="edit_password">Submit</button>
 </form>
+
 <form method="post" action="profileEdit.php">
 	<label>Change your email here</label>
 	<input type="text" required name="email">
@@ -39,6 +47,7 @@ table, th, td {
 </br>
 </br>
 
+<!-- ADDING PAYMENT INFORMATION !-->
 
 <?php echo $payment_table; ?>
 </br>
@@ -67,6 +76,8 @@ table, th, td {
 	<button type="submit" class="btn" name="add_payment">Add payment information</button>
 </form>
 
+<!-- EDITING DELETING PAYMENT INFORMATION !-->
+
 </br>
 </br>
 </br>
@@ -78,7 +89,9 @@ table, th, td {
 			while ($indv_paymentID = mysqli_fetch_array($display_paymentID, MYSQLI_NUM)):;
 		?>
 		<option value = "<?php echo $indv_paymentID[0];?>">
-			<?php echo $indv_paymentID[0]; ?>
+			<?php 
+				echo $indv_paymentID[0]; 
+			?>
 		</option>
 		<?php
 			endwhile;
@@ -86,6 +99,9 @@ table, th, td {
 	</select>
 	<input name="delete_payment_id" type="submit" value="Delete" onclick="return confirm('Are you sure?')">
 </form>
+
+<!-- DELETE YOUR ACCOUNT !-->
+
 </br>
 </br>
 </br>
@@ -95,9 +111,20 @@ table, th, td {
 </form>
 </br>
 </br>
+
+<!-- RETURN TO HOME PAGE !-->
+
 <p>Click here to go back to the home page <a href = "userHomePage.php">Click here</a></p>
 <form method="post" action="login.php">
 	<button type="submit" class="btn" name="signout">Signout</button>
 </form>
 </body>
+
+<!-- PREVENTS ANNOYING RESUBMIT FORM MESSAGE FROM SHOWING UP -->
+<script>
+if ( window.history.replaceState ) {
+  window.history.replaceState( null, null, window.location.href );
+}
+</script>
+
 </html>
