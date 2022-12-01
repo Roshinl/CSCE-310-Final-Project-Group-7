@@ -16,12 +16,16 @@ if($link === false){
     die("ERROR: Could not connect. " . mysqli_connect_error());
 }
 
+// SIGNING OUT
+
 if (isset($_POST['signout'])) {
 	echo "<p>button pressed</p>";
 	session_reset();
 	echo "<p>Reset session</p>";
 	header('Location: login.php');
 }
+
+// REGISTERING AS A NEW USER
 
 if (isset($_POST['register_user'])) {
 	$username = mysqli_real_escape_string($link, $_POST['username']);
@@ -75,11 +79,13 @@ if (isset($_POST['register_user'])) {
 	}
 }
 
+// LOGGING IN AS EXISTING USER
+
 if (isset($_POST['login_user'])) {
 	$username = mysqli_real_escape_string($link, $_POST['username']);
 	$password = mysqli_real_escape_string($link, $_POST['password']);
 	
-	$payload = "SELECT * FROM user WHERE username = '$username' AND password = '$password' LIMIT 1";
+	$payload = "SELECT user_id FROM user WHERE username = '$username' AND password = '$password' LIMIT 1";
 	$execute = mysqli_query($link, $payload);
 	$testUser = mysqli_fetch_assoc($execute);
 	
