@@ -18,3 +18,9 @@ adminHomePage.php - Home page for admin. Ideally, login for admin takes them the
 adminAppointment - Page that allows admin to view all appointments, create appointment between any user/tutor, delete, and update appointments
 
 adminAppointmentBackend - Backend code for adminAppointment.php
+
+#
+Index/Views
+Clinton:
+Index on username (many repeated queries with username attribute)
+View named appointments_table_with_names joins 3 tables for a complex query
