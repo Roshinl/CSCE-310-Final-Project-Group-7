@@ -12,3 +12,9 @@ userHomePage.php - Home page after logging in. From here, the user can navigate 
 profileEdit.php - Page that allows user to edit their user account details as well as add payment information
 
 profileEditBackend.php - Backend code for profileEdit.php
+
+adminHomePage.php - Home page for admin. Ideally, login for admin takes them there. From here, admin can go to separate pages to deal with appointments, courses, etc.
+
+adminAppointment - Page that allows admin to view all appointments, create appointment between any user/tutor, delete, and update appointments
+
+adminAppointmentBackend - Backend code for adminAppointment.php
