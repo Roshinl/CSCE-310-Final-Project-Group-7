@@ -26,4 +26,12 @@
 </br>
 <p>Already have an account? Login here: <a href ="login.php">Login</a></p>
 </body>
+
+<!-- PREVENTS ANNOYING RESUBMIT FORM MESSAGE FROM SHOWING UP -->
+<script>
+if ( window.history.replaceState ) {
+  window.history.replaceState( null, null, window.location.href );
+}
+</script>
+
 </html>
