@@ -25,7 +25,7 @@ $result = mysqli_query($link, $payload);
 
 if (mysqli_num_rows($result) > 0) {
 	$row = mysqli_fetch_assoc($result);
-	$student_table .= "<table><tr><th>Your name</th><th>Your username</th><th>Your password</th><th>Your email</th></tr>";
+	$student_table .= "<table><caption>Your profile details</caption><tr><th>Your name</th><th>Your username</th><th>Your password</th><th>Your email</th></tr>";
 	$student_table .= "<tr><td>".$row["user_fname"]." ".$row["user_lname"]."</td><td>".$row["username"]."</td><td>".$row["password"]."</td><td>".$row["email"]."</td></tr>";
 	$student_table .= "</table>";
 }
@@ -43,7 +43,7 @@ $payload = "SELECT payment_id, card_type, card_num, CVV, zip_code, exp_date FROM
 $result = mysqli_query($link, $payload);
 
 if (mysqli_num_rows($result) > 0) {
-	$payment_table .= "<table><tr><th>Payment ID</th><th>Card type</th><th>Card number</th><th>CVV</th><th>Zip code</th><th>Expiry date</th></tr>";
+	$payment_table .= "<table><caption>Your payment information</caption><tr><th>Payment ID</th><th>Card type</th><th>Card number</th><th>CVV</th><th>Zip code</th><th>Expiry date</th></tr>";
 	while ($row = mysqli_fetch_assoc($result)) {
 		$payment_table .= "<tr><td>".$row["payment_id"]."</td><td>".$row["card_type"]."</td><td>".$row["card_num"]."</td><td>".$row["CVV"]."</td><td>".$row["zip_code"]."</td><td>".$row["exp_date"]."</td></tr>";
 	}
@@ -226,7 +226,7 @@ if (isset($_POST['delete_account'])) {
 	$payload = "DELETE FROM user WHERE user_id = '".$_SESSION['user_id']."'";
 	$execute = mysqli_query($link, $payload);
 	
-	session_reset();
+	session_reset(); // resets session (so username and id aren't carried over)
 	echo "<p>Reset session</p>";
 	header('Location: login.php');
 }
