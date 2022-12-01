@@ -23,5 +23,7 @@ adminAppointmentBackend - Backend code for adminAppointment.php
 Index/Views
 
 Clinton:
+
 Index on username (many repeated queries with username attribute)
+
 View named appointments_table_with_names joins 3 tables for a complex query
