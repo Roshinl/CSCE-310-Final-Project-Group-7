@@ -15,6 +15,15 @@
 	</br>
 	</br>
 	<p>Register here if you don't have an account: <a href ="register.php">Register</a></p>
+	<p>Temporary admin link: <a href = "adminHomePage.php">Admin</a></p>
 </form>
 </body>
+
+<!-- PREVENTS ANNOYING RESUBMIT FORM MESSAGE FROM SHOWING UP -->
+<script>
+if ( window.history.replaceState ) {
+  window.history.replaceState( null, null, window.location.href );
+}
+</script>
+
 </html>
