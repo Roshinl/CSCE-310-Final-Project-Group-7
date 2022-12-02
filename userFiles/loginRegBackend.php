@@ -19,9 +19,10 @@ if($link === false){
 // SIGNING OUT
 
 if (isset($_POST['signout'])) {
-	echo "<p>button pressed</p>";
+	// Resets the session, IE: username and id associated with that session is cleared
 	session_reset();
-	echo "<p>Reset session</p>";
+	
+	// Reloads the page essentially, ensuring everything is updated / recently pulled from DB
 	header('Location: login.php');
 }
 
@@ -39,36 +40,43 @@ if (isset($_POST['register_user'])) {
 	
 	$payload = "SELECT * FROM user WHERE username = '$username' OR email = '$email' LIMIT 1";
 	$execute = mysqli_query($link, $payload);
-	$testUser = mysqli_fetch_assoc($execute);
+	$result = mysqli_fetch_assoc($execute);
 
-	if ($testUser) 
+	// CHECK IF THE USERNAME OR EMAIL IS TAKEN ALREADY
+	
+	if ($result) 
 	{
-		if ($testUser['username'] == $username)
+		if ($result['username'] == $username)
 		{
 			$errorMessage .= "Sorry, this username already exists\\n";
 			$error = True;
 		}
-		if ($testUser['email'] == $email)
+		if ($result['email'] == $email)
 		{
 			$errorMessage .= "Sorry, this email already exists\\n";
 			$error = True;
 		}
 	}
 	
-	echo '<script type="text/javascript">
+	if ($error) {
+		echo '<script type="text/javascript">
 		   window.onload = function () { alert("'.$errorMessage.'"); } 
 			</script>';
+	}
 	
-	if (!$error)
+	else
 	{
 		$payload = "INSERT INTO user (username, password, user_fname, user_lname, email, is_tutor) VALUES('$username',
 		'$password','$fname','$lname','$email', 0)";
 		
+		// Gives error description if insert query did not work
 		if (!mysqli_query($link, $payload))
 		{
 			echo("Error description: " . mysqli_error($link));
 		}
 		
+		// Since user_id is auto incremented / generated, we need to get the new user_id associated with this user
+		// Set session's user_id and username, allows for login information to carry across all links
 		$payload = "SELECT user_id FROM user WHERE username = '$username'";
 		$execute = mysqli_query($link, $payload);
 		$result = mysqli_fetch_assoc($execute);
@@ -87,12 +95,12 @@ if (isset($_POST['login_user'])) {
 	
 	$payload = "SELECT user_id FROM user WHERE username = '$username' AND password = '$password' LIMIT 1";
 	$execute = mysqli_query($link, $payload);
-	$testUser = mysqli_fetch_assoc($execute);
+	$result = mysqli_fetch_assoc($execute);
 	
-	if ($testUser)
+	if ($result)
 	{
 		$_SESSION['username'] = $username;
-		$_SESSION['user_id'] = $testUser["user_id"];
+		$_SESSION['user_id'] = $result["user_id"];
 		header('Location: userHomePage.php');
 	}
 	else
