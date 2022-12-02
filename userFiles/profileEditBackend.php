@@ -37,7 +37,7 @@ else
 
 // DISPLAYS THE PAYMENT TABLE
 
-$payment_table = "";
+$payment_table = ""; // append HTML code to this string. The HTML will then run this code and display the table
 
 $payload = "SELECT payment_id, card_type, card_num, CVV, zip_code, exp_date FROM payment_info WHERE user_id = '".$_SESSION['user_id']."'";
 $result = mysqli_query($link, $payload);
@@ -58,7 +58,7 @@ else
 // DISPLAY PAYMENT IDS FOR DROP DOWN (DYNAMIC)
 
 $payload = "SELECT payment_id FROM payment_info WHERE user_id = '".$_SESSION['user_id']."'";
-$display_paymentID = mysqli_query($link, $payload);
+$display_paymentID = mysqli_query($link, $payload); // this is passed to HTML, which loops + prints the information
 
 // CHANGING PROFILE FIELDS
 
@@ -81,13 +81,13 @@ if (isset($_POST['edit_username'])) {
 	
 	$payload = "SELECT * FROM user WHERE username = '$username' LIMIT 1";
 	$execute = mysqli_query($link, $payload);
-	$testUser = mysqli_fetch_assoc($execute);
+	$result = mysqli_fetch_assoc($execute);
 	
 	$errorMessage = "";
 
-	if ($testUser) 
+	if ($result) // if the query returned any rows
 	{
-		if ($testUser['username'] == $username)
+		if ($result['username'] == $username)
 		{
 			$errorMessage .= "Sorry, this username already exists\\n";
 			echo '<script type="text/javascript">
@@ -99,7 +99,7 @@ if (isset($_POST['edit_username'])) {
 	{
 		$payload = "UPDATE user SET username = '$username' WHERE user_id = '".$_SESSION['user_id']."'";
 		$execute = mysqli_query($link, $payload);
-		$_SESSION['username'] = $username;
+		$_SESSION['username'] = $username; // Update the username to the new username
 		header('Location: profileEdit.php');
 	}
 	
@@ -117,13 +117,13 @@ if (isset($_POST['edit_email'])) {
 	
 	$payload = "SELECT * FROM user WHERE email = '$email' LIMIT 1";
 	$execute = mysqli_query($link, $payload);
-	$testUser = mysqli_fetch_assoc($execute);
+	$result = mysqli_fetch_assoc($execute);
 	
 	$errorMessage = "";
 
-	if ($testUser) 
+	if ($result) 
 	{
-		if ($testUser['email'] == $email)
+		if ($result['email'] == $email)
 		{
 			$errorMessage .= "Sorry, this email already exists\\n";
 			echo '<script type="text/javascript">
@@ -146,33 +146,35 @@ if (isset($_POST['add_payment'])) {
 	$card_num = mysqli_real_escape_string($link, $_POST['card_num']);
 	$cvv = mysqli_real_escape_string($link, $_POST['cvv']);
 	$zip_code = mysqli_real_escape_string($link, $_POST['zip_code']);
-	$expiry = date('Y-m-d', strtotime($_POST['exp_date']));
+	$expiry = date('Y-m-d', strtotime($_POST['exp_date'])); // date converts the string into ready-to-insert SQL
 	
 	$error = False;
 	
 	$errorMessage = "";
 	
-	if (!is_numeric($card_num) && !empty($card_num))
+	if (!is_numeric($card_num)) // checks if the card number is a number
 	{
 		$errorMessage.="Card number must be digits\\n";
 		$error = True;
 	}
-	if (!is_numeric($cvv) && !empty($cvv))
+	if (!is_numeric($cvv))
 	{
 		$errorMessage.="CVV must be digits\\n";
 		$error = True;
 	}
-	if (!is_numeric($zip_code) && !empty($zip_code))
+	if (!is_numeric($zip_code))
 	{
 		$errorMessage.="Zip code must be digits\\n";
 		$error = True;
 	}
 	
-	echo '<script type="text/javascript">
-		   window.onload = function () { alert("'.$errorMessage.'"); } 
-			</script>';
+	if ($error) {
+		echo '<script type="text/javascript">
+			   window.onload = function () { alert("'.$errorMessage.'"); } 
+				</script>';
+	}
 	
-	if (!$error)
+	else
 	{
 		$payload = "SELECT * FROM payment_info WHERE card_num = '$card_num'";
 		$execute = mysqli_query($link, $payload);
@@ -211,6 +213,7 @@ if (isset($_POST['delete_payment_id'])) {
 	$payload = "SELECT payment_id, card_type, card_num, CVV, zip_code, exp_date FROM payment_info WHERE user_id = '".$_SESSION['user_id']."'";
 	$result = mysqli_query($link, $payload);
 	
+	// Checks if the user has any payment information left, if they don't, we set their has_payment to 0
 	if (mysqli_num_rows($result) <= 0)
 	{
 		$payload = "UPDATE student SET has_payment = 0 WHERE user_id = '".$_SESSION['user_id']."'";
@@ -227,7 +230,7 @@ if (isset($_POST['delete_account'])) {
 	$execute = mysqli_query($link, $payload);
 	
 	session_reset(); // resets session (so username and id aren't carried over)
-	echo "<p>Reset session</p>";
+	
 	header('Location: login.php');
 }
 
