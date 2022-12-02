@@ -136,6 +136,7 @@ if (isset($_POST['create_appointment'])) {
 	$errorMessage = "";
 	
 	// CHECK IF TIME IS VALID
+	// Unix time must be used in order to compare time
 	
 	$unix_start_time = strtotime($start_time);
 	$unix_end_time = strtotime($end_time);
@@ -171,9 +172,9 @@ if (isset($_POST['create_appointment'])) {
 	// CHECK IF TUTOR HAS AN APPOINTMENT ON THE SAME DAY WITH CONFLICTING TIMES
 	// Conditions for failure:
 	// Same date && appointment exists on that date already &&
-	// (start_time >= existing_start_time && start_time <= existing_end_time) || << starts after existing and before it ends
-	// (start_time <= existing_start_time && end_time >= existing_end_time) || << envelops
-	// (end_time >= existing_start_time && end_time <= existing_end_time) << end after existing starts and before it ends
+	// (start_time > existing_start_time && start_time < existing_end_time) || << starts after existing and before it ends
+	// (start_time < existing_start_time && end_time > existing_end_time) || << envelops
+	// (end_time > existing_start_time && end_time < existing_end_time) << end after existing starts and before it ends
 	
 	$payload = "SELECT appoint_start_time, appoint_end_time FROM appointments WHERE tutor_id = '$tutor_id' AND appoint_date = '$appointment_date'";
 	$result = mysqli_query($link, $payload);
@@ -210,9 +211,9 @@ if (isset($_POST['create_appointment'])) {
 	// CHECK IF STUDENT HAS AN APPOINTMENT ON THE SAME DAY WITH CONFLICTING TIMES
 	// Conditions for failure:
 	// Same date && appointment exists on that date already &&
-	// (start_time >= existing_start_time && start_time <= existing_end_time) || << starts after existing and before it ends
-	// (start_time <= existing_start_time && end_time >= existing_end_time) || << envelops
-	// (end_time >= existing_start_time && end_time <= existing_end_time) << end after existing starts and before it ends
+	// (start_time > existing_start_time && start_time < existing_end_time) || << starts after existing and before it ends
+	// (start_time < existing_start_time && end_time > existing_end_time) || << envelops
+	// (end_time > existing_start_time && end_time < existing_end_time) << end after existing starts and before it ends
 	
 	$payload = "SELECT appoint_start_time, appoint_end_time FROM appointments WHERE student_id = '$student_id' AND appoint_date = '$appointment_date'";
 	$result = mysqli_query($link, $payload);
@@ -338,9 +339,9 @@ if (isset($_POST['edit_appointment'])) {
 	// CHECK IF TUTOR HAS AN APPOINTMENT ON THE SAME DAY WITH CONFLICTING TIMES
 	// Conditions for failure:
 	// Same date && appointment exists on that date already &&
-	// (start_time >= existing_start_time && start_time <= existing_end_time) || << starts after existing and before it ends
-	// (start_time <= existing_start_time && end_time >= existing_end_time) || << envelops
-	// (end_time >= existing_start_time && end_time <= existing_end_time) << end after existing starts and before it ends
+	// (start_time > existing_start_time && start_time < existing_end_time) || << starts after existing and before it ends
+	// (start_time < existing_start_time && end_time > existing_end_time) || << envelops
+	// (end_time > existing_start_time && end_time < existing_end_time) << end after existing starts and before it ends
 	
 	$payload = "SELECT appoint_start_time, appoint_end_time FROM appointments WHERE tutor_id = '$tutor_id' AND appoint_date = '$appointment_date' AND app_id != '$app_id'";
 	$result = mysqli_query($link, $payload);
@@ -377,9 +378,9 @@ if (isset($_POST['edit_appointment'])) {
 	// CHECK IF STUDENT HAS AN APPOINTMENT ON THE SAME DAY WITH CONFLICTING TIMES
 	// Conditions for failure:
 	// Same date && appointment exists on that date already &&
-	// (start_time >= existing_start_time && start_time <= existing_end_time) || << starts after existing and before it ends
-	// (start_time <= existing_start_time && end_time >= existing_end_time) || << envelops
-	// (end_time >= existing_start_time && end_time <= existing_end_time) << end after existing starts and before it ends
+	// (start_time > existing_start_time && start_time < existing_end_time) || << starts after existing and before it ends
+	// (start_time < existing_start_time && end_time > existing_end_time) || << envelops
+	// (end_time > existing_start_time && end_time < existing_end_time) << end after existing starts and before it ends
 	
 	$payload = "SELECT appoint_start_time, appoint_end_time FROM appointments WHERE student_id = '$student_id' AND appoint_date = '$appointment_date' AND app_id != '$app_id'";
 	$result = mysqli_query($link, $payload);
