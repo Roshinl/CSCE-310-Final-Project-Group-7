@@ -27,23 +27,6 @@ table, th, td {
 </br>
 
 <form method="post" action="adminAppointment.php">
-	<label>Select a student</label>
-	<select required name = "student_username">
-		<option value = ""></option>
-		<?php
-			$i = 0;
-			while ($student_username = mysqli_fetch_array($student_options, MYSQLI_NUM)):;
-		?>
-		<option value = "<?php echo $student_username[0]; ?>">
-			<?php 
-				echo $student_username[0]; 
-			?>
-		</option>
-		<?php 
-			endwhile; 
-		?>
-	</select>
-	
 	<label>Select a tutor</label>
 	<select required name = "tutor_username">
 		<option value = ""></option>
@@ -54,6 +37,24 @@ table, th, td {
 		<option value = "<?php echo $tutor_username[0]; ?>">
 			<?php 
 				echo $tutor_username[0]; 
+			?>
+		</option>
+		<?php 
+			endwhile; 
+		?>
+	</select>
+	
+	</br>
+	<label>Select a student</label>
+	<select required name = "student_username">
+		<option value = ""></option>
+		<?php
+			$i = 0;
+			while ($student_username = mysqli_fetch_array($student_options, MYSQLI_NUM)):;
+		?>
+		<option value = "<?php echo $student_username[0]; ?>">
+			<?php 
+				echo $student_username[0]; 
 			?>
 		</option>
 		<?php 
@@ -102,6 +103,7 @@ table, th, td {
 		?>
 	</select>
 	
+	</br>
 	<label>Select an end time</label>
 	<select required name = "end_time">
 		<option value = ""></option>
@@ -131,15 +133,30 @@ table, th, td {
 You should just create a new appointment with that tutor. Same goes for the course. The only
 editable things should be appointment date/times !-->
 
-<form method="post" action="adminAppointment.php">
+<form method="post" action="adminAppointment.php"> 
+	<label>Select the appointment that you want to change (Required)</label>
+	<select required name = "selected_appointment_id">
+		<option value = ""></option>
+		<?php
+			while ($indv_appointmentID = mysqli_fetch_array($appointment_ids, MYSQLI_NUM)):;
+		?>
+		<option value = "<?php echo $indv_appointmentID[0];?>">
+			<?php 
+				echo $indv_appointmentID[0]; 
+			?>
+		</option>
+		<?php
+			endwhile;
+		?>
+	</select>
+
+	</br>
 	<label>Change the date of the appointment</label>
-	<input type = "date" required name = "new_date">
-	<button type="submit" class="btn" name="edit_date">Submit</button>
-</form>
+	<input type = "date" name = "new_date">
 
-<form method="post" action="adminAppointment.php">
-	<label>Change the start time of the appointment (NOTE: You must also select an end time)</label>
-	<select required name = "new_start_time">
+	</br>
+	<label>Change the start time of the appointment</label>
+	<select name = "new_start_time">
 		<option value = ""></option>
 		<?php
 			$i = 0;
@@ -155,8 +172,10 @@ editable things should be appointment date/times !-->
 			endwhile;
 		?>
 	</select>
+	
+	</br>
 	<label>Change the end time of the appointment</label>
-	<select required name = "new_end_time">
+	<select name = "new_end_time">
 		<option value = ""></option>
 		<?php
 			$i = 0;
@@ -172,17 +191,16 @@ editable things should be appointment date/times !-->
 			endwhile;
 		?>
 	</select>
-	<button type="submit" class="btn" name="edit_time">Submit</button>
-</form>
 
-<form method="post" action="adminAppointment.php">
+	</br>
 	<label>Change the appointment from ongoing (1) to finished (0)</label>
-	<select required name = "new_status">
+	<select name = "new_status">
 		<option value = ""></option>
 		<option value = 0>0</option>
 		<option value = 1>1</option>
 	</select>
-	<button type="submit" class="btn" name="edit_status">Submit</button>
+	
+	<button type="submit" class="btn" name="edit_appointment">Submit</button>
 </form>
 
 <!-- DELETING AN APPOINTMENT COMPLETELY !-->
