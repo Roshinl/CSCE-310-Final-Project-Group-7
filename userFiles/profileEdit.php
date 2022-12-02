@@ -13,6 +13,7 @@ table, th, td {
 <!-- EDITING USER PROFILE AND DETAILS !-->
 
 <?php echo $student_table; ?>
+
 </br>
 <form method="post" action="profileEdit.php">
 	<label>Change your first name here</label>
@@ -50,6 +51,7 @@ table, th, td {
 <!-- ADDING PAYMENT INFORMATION !-->
 
 <?php echo $payment_table; ?>
+
 </br>
 <form method="post" action="profileEdit.php">
 	<label>Card Type</label>
@@ -60,18 +62,23 @@ table, th, td {
 		<option value = "American Express">American Express</option>
 		<option value = "Discover">Discover</option>
 	</select>
+	
 	</br>
 	<label>Card number</label>
 	<input type="text" required name="card_num">
+	
 	</br>
 	<label>CVV</label>
 	<input type="text" required name="cvv">
+	
 	</br>
 	<label>Zip code</label>
 	<input type="text" required name="zip_code">
+	
 	</br>
 	<label>Expiry date</label>
 	<input type = "date" required name = "exp_date">
+	
 	</br>
 	<button type="submit" class="btn" name="add_payment">Add payment information</button>
 </form>
@@ -86,11 +93,11 @@ table, th, td {
 	<select required name = "selected_paymentID">
 		<option value = ""></option>
 		<?php
-			while ($indv_paymentID = mysqli_fetch_array($display_paymentID, MYSQLI_NUM)):;
+			while ($indv_paymentID = mysqli_fetch_array($display_paymentID, MYSQLI_NUM)):; // grabs each row in array format
 		?>
 		<option value = "<?php echo $indv_paymentID[0];?>">
 			<?php 
-				echo $indv_paymentID[0]; 
+				echo $indv_paymentID[0]; // prints the payment ID
 			?>
 		</option>
 		<?php
