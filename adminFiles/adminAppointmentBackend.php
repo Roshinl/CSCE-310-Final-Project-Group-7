@@ -184,15 +184,15 @@ if (isset($_POST['create_appointment'])) {
 			$existing_start_time = strtotime($row["appoint_start_time"]);
 			$existing_end_time = strtotime($row["appoint_end_time"]);
 			
-			if ($unix_start_time >= $existing_start_time && $unix_start_time <= $existing_end_time)
+			if ($unix_start_time > $existing_start_time && $unix_start_time < $existing_end_time)
 			{
 				$error = True;
 			}
-			else if ($unix_start_time <= $existing_start_time && $unix_end_time >= $existing_end_time)
+			else if ($unix_start_time < $existing_start_time && $unix_end_time > $existing_end_time)
 			{
 				$error = True;
 			}
-			else if ($unix_end_time >= $existing_start_time && $unix_end_time <= $existing_end_time)
+			else if ($unix_end_time > $existing_start_time && $unix_end_time < $existing_end_time)
 			{
 				$error = True;
 			}
@@ -223,15 +223,15 @@ if (isset($_POST['create_appointment'])) {
 			$existing_start_time = strtotime($row["appoint_start_time"]);
 			$existing_end_time = strtotime($row["appoint_end_time"]);
 			
-			if ($unix_start_time >= $existing_start_time && $unix_start_time <= $existing_end_time)
+			if ($unix_start_time > $existing_start_time && $unix_start_time < $existing_end_time)
 			{
 				$error = True;
 			}
-			else if ($unix_start_time <= $existing_start_time && $unix_end_time >= $existing_end_time)
+			else if ($unix_start_time < $existing_start_time && $unix_end_time > $existing_end_time)
 			{
 				$error = True;
 			}
-			else if ($unix_end_time >= $existing_start_time && $unix_end_time <= $existing_end_time)
+			else if ($unix_end_time > $existing_start_time && $unix_end_time < $existing_end_time)
 			{
 				$error = True;
 			}
@@ -261,23 +261,168 @@ if (isset($_POST['create_appointment'])) {
 	
 }
 
-// EDITING APPOINTMENT DATE
+// EDITING APPOINTMENT
 
-if (isset($_POST['edit_date'])) {
+if (isset($_POST['edit_appointment'])) {
+	$app_id = mysqli_real_escape_string($link, $_POST['selected_appointment_id']);
+	$appointment_date = date('Y-m-d', strtotime($_POST['new_date']));
+	$start_time_string = mysqli_real_escape_string($link, $_POST['new_start_time']);
+	$end_time_string = mysqli_real_escape_string($link, $_POST['new_end_time']);
+	$start_time = date('H:i:s', strtotime($start_time_string));
+	$end_time = date('H:i:s', strtotime($end_time_string));
+	$status = mysqli_real_escape_string($link, $_POST['new_status']);
+	
+	$error = False;
+	$errorMessage = "";
+	
+	$payload = "SELECT tutor_id, student_id, appoint_date, appoint_start_time, appoint_end_time, status FROM appointments WHERE app_id = '$app_id'";
+	$result = mysqli_query($link, $payload); 
+	
+	$row = mysqli_fetch_assoc($result);
+				
+	// SETS THE DEFAULT VALUE FOR EACH ENTRY IF NOTHING IS ENTERED
+	
+	// Date default value, means user didn't enter anything for date
+	// Set date to what is already in DB
+	if ($appointment_date == "1970-01-01") {
+		$appointment_date = $row["appoint_date"];
+	}
+	
+	// If the inputted start time was an empty string, then it defaults to midnight. Thus, we want to check against empty string
+	// You could also check the start_time against midnight, since midnight is not a valid input
+	if ($start_time_string == "") {
+		$start_time = date('H:i:s', strtotime($row["appoint_start_time"]));
+	}
+	else {
+		$start_time = date('H:i:s', strtotime($_POST['new_start_time']));
+	}
+	
+	// Same logic as above
+	if ($end_time_string == "") {
+		$end_time = date('H:i:s', strtotime($row["appoint_end_time"]));
+	}
+	else {
+		$end_time = date('H:i:s', strtotime($_POST['new_end_time']));
+	}
+	
+	if ($status == "") {
+		$status = $row["status"];
+	}
+	
+	$tutor_id = $row["tutor_id"];
+	$student_id = $row["student_id"];
+	
+	// CHECK IF DATE IS VALID
+	
+	$unix_start_time = strtotime($start_time);
+	$unix_end_time = strtotime($end_time);
+	
+	if ($unix_start_time >= $unix_end_time)
+	{
+		echo '<script type="text/javascript">
+		   window.onload = function () { alert("Sorry, your end time cannot be equal or less than your start time"); } 
+			</script>';	
+		$error = True;
+	}
+	
+	// CHECK IF DATE IS BEFORE THE CURRENT DATE
+	
+	if (strtotime($appointment_date) <= strtotime('now'))
+	{
+		echo '<script type="text/javascript">
+		   window.onload = function () { alert("Sorry, your appointment date cannot be before today"); } 
+			</script>';	
+		$error = True;
+	}
+	
+	// CHECK IF TUTOR HAS AN APPOINTMENT ON THE SAME DAY WITH CONFLICTING TIMES
+	// Conditions for failure:
+	// Same date && appointment exists on that date already &&
+	// (start_time >= existing_start_time && start_time <= existing_end_time) || << starts after existing and before it ends
+	// (start_time <= existing_start_time && end_time >= existing_end_time) || << envelops
+	// (end_time >= existing_start_time && end_time <= existing_end_time) << end after existing starts and before it ends
+	
+	$payload = "SELECT appoint_start_time, appoint_end_time FROM appointments WHERE tutor_id = '$tutor_id' AND appoint_date = '$appointment_date' AND app_id != '$app_id'";
+	$result = mysqli_query($link, $payload);
+	
+	// Tutor has appointment on that date already, check for time conflict
+	if (mysqli_num_rows($result) > 0) {
+		while ($row = mysqli_fetch_assoc($result)) {
+			$existing_start_time = strtotime($row["appoint_start_time"]);
+			$existing_end_time = strtotime($row["appoint_end_time"]);
+			
+			if ($unix_start_time > $existing_start_time && $unix_start_time < $existing_end_time)
+			{
+				$error = True;
+			}
+			else if ($unix_start_time < $existing_start_time && $unix_end_time > $existing_end_time)
+			{
+				$error = True;
+			}
+			else if ($unix_end_time > $existing_start_time && $unix_end_time < $existing_end_time)
+			{
+				$error = True;
+			}
+			
+			if ($error)
+			{
+				echo '<script type="text/javascript">
+			   window.onload = function () { alert("Sorry, the tutor has a conflicting appointment at your selected time"); } 
+				</script>';	
+				break;
+			}
+		}
+	}
+	
+	// CHECK IF STUDENT HAS AN APPOINTMENT ON THE SAME DAY WITH CONFLICTING TIMES
+	// Conditions for failure:
+	// Same date && appointment exists on that date already &&
+	// (start_time >= existing_start_time && start_time <= existing_end_time) || << starts after existing and before it ends
+	// (start_time <= existing_start_time && end_time >= existing_end_time) || << envelops
+	// (end_time >= existing_start_time && end_time <= existing_end_time) << end after existing starts and before it ends
+	
+	$payload = "SELECT appoint_start_time, appoint_end_time FROM appointments WHERE student_id = '$student_id' AND appoint_date = '$appointment_date' AND app_id != '$app_id'";
+	$result = mysqli_query($link, $payload);
+	
+	// Student has appointment on that date already, check for time conflict
+	if (mysqli_num_rows($result) > 0) {
+		while ($row = mysqli_fetch_assoc($result)) {
+			$existing_start_time = strtotime($row["appoint_start_time"]);
+			$existing_end_time = strtotime($row["appoint_end_time"]);
+			
+			if ($unix_start_time > $existing_start_time && $unix_start_time < $existing_end_time)
+			{
+				$error = True;
+			}
+			else if ($unix_start_time < $existing_start_time && $unix_end_time > $existing_end_time)
+			{
+				$error = True;
+			}
+			else if ($unix_end_time > $existing_start_time && $unix_end_time < $existing_end_time)
+			{
+				$error = True;
+			}
+			
+			if ($error)
+			{
+				echo '<script type="text/javascript">
+			   window.onload = function () { alert("Sorry, you have a conflicting appointment at the selected time"); } 
+				</script>';	
+				break;
+			}
+		}
+	}
+	
+	if (!$error)
+	{
+		$payload = "UPDATE appointments SET appoint_date = '$appointment_date', appoint_start_time = '$start_time', appoint_end_time = '$end_time', status = '$status' WHERE app_id = '$app_id'";
+		$result = mysqli_query($link, $payload);
+		
+		header('Location: adminAppointment.php');
+	}
 	
 }
 
-// EDITING APPOINTMENT TIME
-
-if (isset($_POST['edit_time'])) {
-	
-}
-
-// EDITING STATUS OF THE APPOINTMENT
-
-if (isset($_POST['edit_status'])) {
-	
-}
 
 if (isset($_POST['delete_appointment_id'])) {
 	$to_delete_id = mysqli_real_escape_string($link, $_POST['selected_appointment_id']);
