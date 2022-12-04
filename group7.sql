@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Dec 01, 2022 at 01:33 PM
+-- Generation Time: Dec 04, 2022 at 11:20 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.0.1
 
@@ -44,8 +44,10 @@ CREATE TABLE `appointments` (
 --
 
 INSERT INTO `appointments` (`app_id`, `course_id`, `tutor_id`, `student_id`, `appoint_date`, `appoint_start_time`, `appoint_end_time`, `description`, `status`) VALUES
-(1, 1, 5, 1, '2022-12-14', '13:00:00', '15:00:00', NULL, 1),
-(3, 1, 6, 4, '2022-12-28', '10:00:00', '15:00:00', NULL, 1);
+(1, 1, 5, 1, '2022-12-14', '13:00:00', '15:00:00', NULL, 0),
+(3, 1, 6, 4, '2022-12-28', '10:00:00', '15:00:00', NULL, 1),
+(4, 1, 6, 4, '2022-12-19', '09:00:00', '10:00:00', NULL, 0),
+(5, 1, 5, 1, '2022-12-28', '11:00:00', '13:00:00', NULL, 1);
 
 --
 -- Triggers `appointments`
@@ -128,7 +130,8 @@ CREATE TABLE `payment_info` (
 --
 
 INSERT INTO `payment_info` (`payment_id`, `user_id`, `card_type`, `card_num`, `CVV`, `zip_code`, `exp_date`) VALUES
-(1, 1, 'American Express', '123', '123', '123', '2022-11-01');
+(1, 1, 'American Express', '123', '123', '123', '2022-11-01'),
+(2, 4, 'Mastercard', '999', '888', '53453', '2022-12-30');
 
 --
 -- Triggers `payment_info`
@@ -151,11 +154,38 @@ CREATE TABLE `reviews` (
   `review_id` int(11) NOT NULL,
   `app_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `content` text NOT NULL,
+  `content` text,
   `num_stars` int(11) NOT NULL,
-  `review_date` date NOT NULL,
-  `review_time` time NOT NULL
+  `review_date_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Triggers `reviews`
+--
+DELIMITER $$
+CREATE TRIGGER `increment_review_id` BEFORE INSERT ON `reviews` FOR EACH ROW BEGIN
+	SET NEW.review_id = (SELECT IFNULL(MAX(review_id), 0) + 1 FROM reviews);
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `reviews_table_with_names`
+-- (See below for the actual view)
+--
+CREATE TABLE `reviews_table_with_names` (
+`review_id` int(11)
+,`app_id` int(11)
+,`content` text
+,`num_stars` int(11)
+,`review_date_time` datetime
+,`tutor_id` int(11)
+,`tutor_fname` text
+,`tutor_lname` text
+,`course_name` text
+);
 
 -- --------------------------------------------------------
 
@@ -174,7 +204,7 @@ CREATE TABLE `student` (
 
 INSERT INTO `student` (`user_id`, `has_payment`) VALUES
 (1, 1),
-(4, 0);
+(4, 1);
 
 -- --------------------------------------------------------
 
@@ -257,6 +287,15 @@ DELIMITER ;
 DROP TABLE IF EXISTS `appointments_table_with_names`;
 
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `appointments_table_with_names`  AS SELECT `appointments`.`app_id` AS `app_id`, `courses`.`course_id` AS `course_id`, `courses`.`course_name` AS `course_name`, `appointments`.`tutor_id` AS `tutor_id`, `foo`.`username` AS `tutor_username`, `appointments`.`student_id` AS `student_id`, `bar`.`username` AS `student_username`, `appointments`.`appoint_date` AS `appoint_date`, `appointments`.`appoint_start_time` AS `appoint_start_time`, `appointments`.`appoint_end_time` AS `appoint_end_time`, `appointments`.`status` AS `status` FROM (((`appointments` join `user` `foo` on((`appointments`.`tutor_id` = `foo`.`user_id`))) join `user` `bar` on((`appointments`.`student_id` = `bar`.`user_id`))) join `courses` on((`appointments`.`course_id` = `courses`.`course_id`)))  ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `reviews_table_with_names`
+--
+DROP TABLE IF EXISTS `reviews_table_with_names`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `reviews_table_with_names`  AS SELECT `reviews`.`review_id` AS `review_id`, `reviews`.`app_id` AS `app_id`, `reviews`.`content` AS `content`, `reviews`.`num_stars` AS `num_stars`, `reviews`.`review_date_time` AS `review_date_time`, `appointments`.`tutor_id` AS `tutor_id`, `foo`.`user_fname` AS `tutor_fname`, `foo`.`user_lname` AS `tutor_lname`, `courses`.`course_name` AS `course_name` FROM (((`reviews` join `appointments` on((`reviews`.`app_id` = `appointments`.`app_id`))) join `courses`) join `user` `foo` on((`appointments`.`tutor_id` = `foo`.`user_id`)))  ;
 
 --
 -- Indexes for dumped tables
