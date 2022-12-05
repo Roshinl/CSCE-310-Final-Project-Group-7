@@ -30,6 +30,6 @@ View named appointments_table_with_names joins 3 tables for a complex query
 
 JP:
 
-View called reviews_table_with_names; seen on reviews page, joins appointment, course, and user tables
+View called reviews_table_with_names; seen on reviews page, joins appointment, course, and user tables to display tutor names, appointment ids, and their respective reviews
 
 
