@@ -124,7 +124,18 @@ if (isset($_POST['login_user'])) {
 	{
 		$_SESSION['username'] = $username;
 		$_SESSION['user_id'] = $result["user_id"];
-		header('Location: userHomePage.php');
+		$payload = "SELECT is_admin FROM tutor WHERE user_id = '".$_SESSION['user_id']."' LIMIT 1";
+		$execute = mysqli_query($link, $payload);
+		$result = mysqli_fetch_assoc($execute);
+		
+		if ($result && $result["is_admin"])
+		{
+			header('Location: adminHomePage.php');
+		}
+		else
+		{
+			header('Location: userHomePage.php');
+		}
 	}
 	else
 	{
