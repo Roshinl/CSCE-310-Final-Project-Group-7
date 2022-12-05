@@ -38,10 +38,33 @@ if (isset($_POST['register_user'])) {
 	$error = False;
 	$errorMessage = "";
 	
+	// CHECK IF FIRST NAME, LAST NAME, AND EMAIL ARE VALID
+	
+	if (!ctype_alpha($fname)) {
+		$errorMessage .= "Sorry, your first name is invalid\\n";
+		$error = True;
+	}
+	if (!ctype_alpha($lname)) {
+		$errorMessage .= "Sorry, your last name is invalid\\n";
+		$error = True;
+	}
+	if(!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+		// checks to see if the email is in email format
+		$errorMessage .= "Sorry, your email is invalid\\n";
+		$error = True;
+	}
+	
+	if ($error) {
+		// duplicate error message here in order to prevent redundant SQL query on already invalid input
+		echo '<script type="text/javascript">
+		   window.onload = function () { alert("'.$errorMessage.'"); } 
+			</script>';
+	}
+	
 	$payload = "SELECT * FROM user WHERE username = '$username' OR email = '$email' LIMIT 1";
 	$execute = mysqli_query($link, $payload);
 	$result = mysqli_fetch_assoc($execute);
-
+	
 	// CHECK IF THE USERNAME OR EMAIL IS TAKEN ALREADY
 	
 	if ($result) 
