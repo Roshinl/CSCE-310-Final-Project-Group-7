@@ -75,14 +75,22 @@ if (isset($_POST['register_admin'])) {
 		{
 			echo("Error description: " . mysqli_error($link));
 		}
+
+		// Since user_id is auto incremented / generated, we need to get the new user_id associated with this user
+		// Set session's user_id and username, allows for login information to carry across all links
+		$payload = "SELECT user_id FROM user WHERE username = '$username'";
+		$execute = mysqli_query($link, $payload);
+		$result = mysqli_fetch_assoc($execute);
 		
+		$_SESSION['username'] = $username;
+		$_SESSION['user_id'] = $result["user_id"];		
 		header('Location: adminHomePage.php');
 	}
 }
 
-// REGISTERING AS A NEW USER
+// REGISTERING AS A NEW STUDENT
 
-if (isset($_POST['register_user'])) {
+if (isset($_POST['register_student'])) {
 	$username = mysqli_real_escape_string($link, $_POST['username']);
 	$password = mysqli_real_escape_string($link, $_POST['password']);
 	$fname = mysqli_real_escape_string($link, $_POST['fname']);
@@ -129,9 +137,66 @@ if (isset($_POST['register_user'])) {
 			echo("Error description: " . mysqli_error($link));
 		}
 		
-		header('Location: adminHomePage.php');
+		header('Location: registerUser.php');
 	}
 }
+
+
+
+// REGISTERING AS A NEW TUTOR
+
+if (isset($_POST['register_tutor'])) {
+	$username = mysqli_real_escape_string($link, $_POST['username']);
+	$password = mysqli_real_escape_string($link, $_POST['password']);
+	$fname = mysqli_real_escape_string($link, $_POST['fname']);
+	$lname = mysqli_real_escape_string($link, $_POST['lname']);
+	$email = mysqli_real_escape_string($link, $_POST['email']);
+
+	$error = False;
+	$errorMessage = "";
+	
+	$payload = "SELECT * FROM user WHERE username = '$username' OR email = '$email' LIMIT 1";
+	$execute = mysqli_query($link, $payload);
+	$result = mysqli_fetch_assoc($execute);
+
+	// CHECK IF THE USERNAME OR EMAIL IS TAKEN ALREADY
+	
+	if ($result) 
+	{
+		if ($result['username'] == $username)
+		{
+			$errorMessage .= "Sorry, this username already exists\\n";
+			$error = True;
+		}
+		if ($result['email'] == $email)
+		{
+			$errorMessage .= "Sorry, this email already exists\\n";
+			$error = True;
+		}
+	}
+	
+	if ($error) {
+		echo '<script type="text/javascript">
+		   window.onload = function () { alert("'.$errorMessage.'"); } 
+			</script>';
+	}
+	
+	else
+	{
+		$payload = "INSERT INTO user (username, password, user_fname, user_lname, email, is_tutor) VALUES('$username',
+		'$password','$fname','$lname','$email', 1)";
+		
+		// Gives error description if insert query did not work
+		if (!mysqli_query($link, $payload))
+		{
+			echo("Error description: " . mysqli_error($link));
+		}
+		
+		header('Location: registerUser.php');
+	}
+}
+
+
 
 
 // LOGGING IN AS EXISTING USER
