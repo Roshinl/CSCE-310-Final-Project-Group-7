@@ -49,7 +49,32 @@ table, th, td {
 </br>
 
 <!-- ADDING PAYMENT INFORMATION !-->
+<!-- Radio buttons that allow you to choose how to sort the table !-->
+<form method="post" action="profileEdit.php">
+	<label>Sort Payment table</label>
+	</br>
 
+	<input type="radio" id="payment1" name="payment_table" value="0">
+	<label for="payment1">Order by ID</label>
+	
+	<input type="radio" id="payment2" name="payment_table" value="1">
+	<label for="payment2">Order by card type</label>
+	
+	<input type="radio" id="payment3" name="payment_table" value="2">
+	<label for="payment3">Order by card number</label>
+
+	<input type="radio" id="payment4" name="payment_table" value="3">
+	<label for="payment4">Order by CVV</label>
+	
+	<input type="radio" id="payment5" name="payment_table" value="4">
+	<label for="payment5">Order by zip code</label>
+	
+	<input type="radio" id="payment6" name="payment_table" value="5">
+	<label for="payment6">Order by expiry date</label>
+	
+	</br>
+	<button type="submit" class="btn" name="payment_table_order">Submit</button>
+</form>
 <?php echo $payment_table; ?>
 
 </br>
