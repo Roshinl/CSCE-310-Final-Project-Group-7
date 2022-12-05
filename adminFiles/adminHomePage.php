@@ -9,6 +9,7 @@
 <p>Click here to edit your profile settings <a href = "profileEdit.php">Click here</a></p>
 <p>Click here to manage all appointments <a href ="adminAppointment.php">Click here</a></p>
 <p>Click here to register a user account <a href="registerUser.php">Click here </a></p>
+<p>Click here to update a user account profile <a href="userProfileEdit.php">Click here </a></p>
 
 </body>
 </html>
