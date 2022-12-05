@@ -37,23 +37,8 @@ else
 
 // DISPLAYS THE PAYMENT TABLE
 
-$payment_table = ""; // append HTML code to this string. The HTML will then run this code and display the table
-
 $payload = "SELECT payment_id, card_type, card_num, CVV, zip_code, exp_date FROM payment_info WHERE user_id = '".$_SESSION['user_id']."'";
-$result = mysqli_query($link, $payload);
-
-if (mysqli_num_rows($result) > 0) {
-	$payment_table .= "<table><caption>Your payment information</caption><tr><th>Payment ID</th><th>Card type</th><th>Card number</th><th>CVV</th><th>Zip code</th><th>Expiry date</th></tr>";
-	while ($row = mysqli_fetch_assoc($result)) {
-		$payment_table .= "<tr><td>".$row["payment_id"]."</td><td>".$row["card_type"]."</td><td>".$row["card_num"]."</td><td>".$row["CVV"]."</td><td>".$row["zip_code"]."</td><td>".$row["exp_date"]."</td></tr>";
-	}
-	$payment_table .= "</table>";
-}
-else 
-{
-	$payment_table .= "<table><tr><th>Payment ID</th><th>Card type</th><th>Card number</th><th>CVV</th><th>Zip code</th><th>Expiry date</th></tr></table>";
-	$payment_table .= "<p>0 results</p>";
-}
+$payment_table = print_payment_table($link, $payload);
 
 // DISPLAY PAYMENT IDS FOR DROP DOWN (DYNAMIC)
 
@@ -137,6 +122,38 @@ if (isset($_POST['edit_email'])) {
 		$execute = mysqli_query($link, $payload);
 		header('Location: profileEdit.php');
 	}
+}
+
+// SORTING PAYMENT TABLE
+
+if (isset($_POST['payment_table_order'])) {
+	$order_by = $_POST['payment_table'];
+	$payload = "SELECT payment_id, card_type, card_num, CVV, zip_code, exp_date FROM payment_info WHERE user_id = '".$_SESSION['user_id']."'";
+	// switch case decides how to order the table
+	switch ($order_by) {
+		case 0:
+			$payload .= " ORDER BY payment_id";
+		break;
+		case 1:
+			$payload .= " ORDER BY card_type";
+		break;
+		case 2:
+			$payload .= " ORDER BY card_num";
+		break;
+		case 3:
+			$payload .= " ORDER BY CVV";
+		break;
+		case 4:
+			$payload .= " ORDER BY zip_code";
+		break;
+		case 5:
+			$payload .= " ORDER BY exp_date";
+		break;
+		default:
+			$payload .= "";
+	}
+	$payment_table = print_payment_table($link, $payload);
+	
 }
 
 // ADDING PAYMENT INFORMATION
@@ -232,6 +249,26 @@ if (isset($_POST['delete_account'])) {
 	session_reset(); // resets session (so username and id aren't carried over)
 	
 	header('Location: login.php');
+}
+
+function print_payment_table($link, $payload) {
+	// Append HTML code in order to generate the HTML table code
+	$table = "<table><caption>Your payment information</caption><tr><th>Payment ID</th><th>Card type</th><th>Card number</th><th>CVV</th><th>Zip code</th><th>Expiry date</th></tr>";
+	
+	$result = mysqli_query($link, $payload);
+
+	if (mysqli_num_rows($result) > 0) {
+		while ($row = mysqli_fetch_assoc($result)) {
+			$table .= "<tr><td>".$row["payment_id"]."</td><td>".$row["card_type"]."</td><td>".$row["card_num"]."</td><td>".$row["CVV"]."</td><td>".$row["zip_code"]."</td><td>".$row["exp_date"]."</td></tr>";
+		}
+		$table .= "</table>";
+	}
+	else 
+	{
+		$table .= "</table>";
+		$table .= "<p>0 results</p>";
+	}
+	return $table;
 }
 
 mysqli_close($link);
