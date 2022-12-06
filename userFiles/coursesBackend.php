@@ -50,6 +50,7 @@ if (mysqli_num_rows($result) > 0) {
 }
 
 // GET COURSE IDS FOR DROP DOWN
+// TODO: Only display courses which they have appointments for
 $payload = "SELECT course_id FROM courses";
 $course_ids = mysqli_query($link, $payload);
 
@@ -121,6 +122,7 @@ if (isset($_POST['go_to_checkout'])) {
 }
 
 // PAY FOR COURSE(S)
+// TODO: Update status on appointments table from 2 (not paid) to 1 (paid/ongoing) upon payment
 if (isset($_POST['checkout'])) {
 	$card_type = mysqli_real_escape_string($link, $_POST['card_type']);
 	$card_num = mysqli_real_escape_string($link, $_POST['card_num']);
