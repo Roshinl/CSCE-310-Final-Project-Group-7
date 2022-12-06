@@ -16,6 +16,7 @@ table, th, td {
 
 </br>
 <!-- DROPDOWN FOR USERS -->
+<h1> Update User's Profile </h1>
 
 <form method="post" action="userProfileEdit.php">
 <label>  Select a User ID Profile to Update:</label>
@@ -103,17 +104,24 @@ table, th, td {
 	<input type="text" required name="email">
 	<button type="submit" class="btn" name="edit_email">Submit</button>
 </form>
-</br>
-</br>
-</br>
 
-
+<br><br>
 <!-- ADDING PAYMENT INFORMATION !-->
-
-<?php echo $payment_table; ?>
+<?php echo $student_payment_table; ?>
 
 </br>
+<h1> Add Payment Information </h1>
 <form method="post" action="userProfileEdit.php">
+	<label>  Select a User ID Profile to Update:</label>
+	<select name="availUser">
+		<option value=""> --Select a User ID-- </option>
+		<?php 
+				foreach($availableStudents as $eachStudent){
+					echo "<option value='$eachStudent'> $eachStudent </option>";
+				}
+				?>
+		</select> 
+	<br>
 	<label>Card Type</label>
 	<select required name = "card_type">
 		<option value = ""></option>
@@ -143,41 +151,55 @@ table, th, td {
 	<button type="submit" class="btn" name="add_payment">Add payment information</button>
 </form>
 
-<!-- EDITING DELETING PAYMENT INFORMATION !-->
 
-</br>
-</br>
-</br>
+<!--DELETING PAYMENT INFORMATION  !-->
+<h1> Delete Payment Information </h1>
+<?php echo $payment_table; ?>
+<br>
 <form method="post" action="userProfileEdit.php">
-	<label>Select a payment ID to delete</label>
-	<select required name = "selected_paymentID">
-		<option value = ""></option>
-		<?php
-			while ($indv_paymentID = mysqli_fetch_array($display_paymentID, MYSQLI_NUM)):; // grabs each row in array format
-		?>
-		<option value = "<?php echo $indv_paymentID[0];?>">
-			<?php 
-				echo $indv_paymentID[0]; // prints the payment ID
-			?>
-		</option>
-		<?php
-			endwhile;
-		?>
-	</select>
+	<label>  Select a User ID Profile to View Their Payment Methods:</label>
+	<select name="availUser">
+		<option value=""> --Select a User ID-- </option>
+		<?php 
+				foreach($availableStudents as $eachStudent){
+					echo "<option value='$eachStudent'> $eachStudent </option>";
+				}
+				?>
+		</select> 
+	<button type="submit" class="btn" name="view_payment">View payment information</button>
+
+	<br>
+<!-- </form> -->
+
+<!-- <form method="post" action="userProfileEdit.php"> -->
+	<label>Type in a payment ID to delete for this user</label>
+	<input type="text" name="chosen_payment_id">
 	<input name="delete_payment_id" type="submit" value="Delete" onclick="return confirm('Are you sure?')">
 </form>
 
-<!-- DELETE YOUR ACCOUNT !-->
 
-</br>
-</br>
-</br>
+<!-- DELETE USERS ACCOUNT ! -->
+<h1> Delete User's Account </h1>
+
 <form method="post" action="userProfileEdit.php">
-	<label>Delete your account by pressing this button</label>
+	
+<label>  Select a User ID Profile to Delete:</label>
+    
+	<select name="availUser">
+		<option value=""> --Select a User ID-- </option>
+		<?php 
+				foreach($availableUsers as $eachUser){
+					echo "<option value='$eachUser'> $eachUser </option>";
+				}
+				?>
+		</select> 
+
+	<label>Delete their account by pressing this button</label>
 	<input name="delete_account" type="submit" value="Delete" onclick="return confirm('Are you sure?')">
 </form>
-</br>
-</br>
+<br>
+<br>
+<br>
 
 <!-- RETURN TO HOME PAGE !-->
 
