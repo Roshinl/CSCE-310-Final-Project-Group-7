@@ -36,13 +36,13 @@ if (mysqli_num_rows($result) > 0) {
 $courses_registered_table = "";
 
 // DISPLAY COURSES STUDENT HAS AN APPOINTMENT FOR
-$payload = "SELECT DISTINCT course_id, course_name, tutor_id, tutor_username FROM appointments_table_with_names WHERE student_id = '".$_SESSION['user_id']."'";
+$payload = "SELECT DISTINCT course_id, course_name FROM appointments_table_with_names WHERE (`status` = 1 OR `status` = 2) AND student_id = '".$_SESSION['user_id']."'";
 $result = mysqli_query($link, $payload);
 
 if (mysqli_num_rows($result) > 0) {
-    $courses_registered_table .= "<table><caption>Registered Courses</caption><tr><td><b>Course ID</b></td><td><b>Course Name</b></td><td><b>Tutor ID</b></td><td><b>Tutor</b></td></tr>";
+    $courses_registered_table .= "<table><caption>Registered Courses</caption><tr><td><b>Course ID</b></td><td><b>Course Name</b></td></tr>";
     while ($row = mysqli_fetch_assoc($result)) {
-        $courses_registered_table .= "<tr><td>".$row["course_id"]."</td><td>".$row["course_name"]."</td><td>".$row["tutor_id"]."</td><td>".$row["tutor_username"]."</td></tr>";
+        $courses_registered_table .= "<tr><td>".$row["course_id"]."</td><td>".$row["course_name"]."</td></tr>";
     }
     $courses_registered_table .= "</table>";
 } else {
@@ -50,7 +50,7 @@ if (mysqli_num_rows($result) > 0) {
 }
 
 // GET COURSE IDS FOR DROP DOWN
-// TODO: Only display courses which they have appointments for
+// TODO: Only display courses which they have unpaid or ongoing appointments for
 $payload = "SELECT course_id FROM courses";
 $course_ids = mysqli_query($link, $payload);
 
