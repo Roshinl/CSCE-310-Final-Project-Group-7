@@ -19,6 +19,10 @@ adminAppointment - Page that allows admin to view all appointments, create appoi
 
 adminAppointmentBackend - Backend code for adminAppointment.php
 
+userProfileEdit.php - Pages allows admin to edit a student/tutors profile; allows for adding/deleting payment information and account deletion.
+
+userProfileEditBackend - Backend code for userProfileEdit.php
+
 #
 Index/Views
 
