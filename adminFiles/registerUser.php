@@ -4,7 +4,7 @@
 <head><title>Register</title></head>
 <body>
 <head>REGISTER A STUDENT HERE</head>
-<form method="post" action="register.php">
+<form method="post" action="registerUser.php">
 	<label>Username</label>
 	<input type="text" required name="username">
 	
@@ -31,7 +31,7 @@
 <br><br>
 
 <head>REGISTER A TUTOR HERE</head>
-<form method="post" action="register.php">
+<form method="post" action="registerUser.php">
 	<label>Username</label>
 	<input type="text" required name="username">
 	
@@ -52,7 +52,18 @@
 	<input type="text" required name="email">
 	
 	</br>
+
+	<label>  Is this tutor an admin? </label>
+    
+	<select name="isAdmin">
+		<option value="Yes"> Yes  </option>
+		<option value="No"> No  </option>
+
+	</select> 
+
+	<br>
 	<button type="submit" class="btn" name="register_tutor">Register</button>
+
 </form>
 </br>
 </br>
