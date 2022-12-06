@@ -50,7 +50,7 @@ if (mysqli_num_rows($result) > 0) {
 }
 
 // GET COURSE IDS FOR DROP DOWN
-$payload = "SELECT DISTINCT course_id FROM appointments WHERE (`status` = 1 OR `status` = 2) AND course_id NOT IN (SELECT course_id from cart) AND student_id = '".$_SESSION['user_id']."'";
+$payload = "SELECT DISTINCT course_id FROM appointments WHERE `status` = 2 AND course_id NOT IN (SELECT course_id from cart) AND student_id = '".$_SESSION['user_id']."'";
 $course_ids = mysqli_query($link, $payload);
 
 // ADD COURSES TO CART
@@ -121,7 +121,6 @@ if (isset($_POST['go_to_checkout'])) {
 }
 
 // PAY FOR COURSE(S)
-// TODO: Update status on appointments table from 2 (not paid) to 1 (paid/ongoing) upon payment
 if (isset($_POST['checkout'])) {
 	$card_type = mysqli_real_escape_string($link, $_POST['card_type']);
 	$card_num = mysqli_real_escape_string($link, $_POST['card_num']);
@@ -166,12 +165,17 @@ if (isset($_POST['checkout'])) {
 		$execute = mysqli_query($link, $payload);
 	
 		if (mysqli_num_rows($execute) > 0) { // check that payment method matches one of the user's existing methods
-			$payload = "DELETE FROM cart WHERE user_id = '".$_SESSION['user_id']."'";
+			$update_status = "UPDATE appointments SET `status` = 1 WHERE student_id = '".$_SESSION['user_id']."'"; // update status to indicate appointments for the course have been paid for
+            $empty_cart = "DELETE FROM cart WHERE user_id = '".$_SESSION['user_id']."'"; // empty user's cart
 
-            if (!mysqli_query($link, $payload)) {
-			    echo("Error description: " . mysqli_error($link));
-		    }
-		
+            if (!mysqli_query($link, $update_status)) {
+                echo("Error description: " . mysqli_error($link));
+            }
+
+            if (!mysqli_query($link, $empty_cart)) {
+                echo("Error description: " . mysqli_error($link));
+            }
+            
 		    header('Location: courses.php');
 		} 
 
