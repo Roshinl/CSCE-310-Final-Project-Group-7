@@ -17,21 +17,13 @@ if($link === false){
     die("ERROR: Could not connect. " . mysqli_connect_error());
 }
 
-function checkValidDate($appointment_date){
-	$error = False;
 
-	if (strtotime($appointment_date) <= strtotime('now'))
-	    {
-	        echo '<script type="text/javascript">
-	        window.onload = function () { alert("Sorry, your appointment date cannot be before today."); } 
-	            </script>';	
-	        $error = True;
-	    }
-		return $error;
-}
 
 function checkValidTime($unix_start_time, $unix_end_time){
 	$error = False;
+	print_r("------------");
+	print_r($unix_start_time);
+	print_r($unix_end_time);
 
 	if ($unix_start_time >= $unix_end_time)
 	{
@@ -40,30 +32,6 @@ function checkValidTime($unix_start_time, $unix_end_time){
 			</script>';	
 		$error = True;
 	}
-}
-
-function checkValidDateTime($appointment_date, $unix_start_time, $unix_end_time){
-	//CHECK FOR VALID TIMES
-	$error = False;
-
-	if ($unix_start_time >= $unix_end_time)
-	{
-		echo '<script type="text/javascript">
-		   window.onload = function () { alert("Sorry, your end time cannot be equal or less than your start time"); } 
-			</script>';	
-		$error = True;
-	}
-
-
-    // CHECK IF DATE IS CHOSEN IS BEFORE CURRENT DAY
-	echo "got to function";
-    if (strtotime($appointment_date) <= strtotime('now'))
-    {
-        echo '<script type="text/javascript">
-        window.onload = function () { alert("Sorry, your appointment date cannot be before today."); } 
-            </script>';	
-        $error = True;
-    }
 	return $error;
 }
 
@@ -122,7 +90,7 @@ $result = mysqli_query($link, $query);
 
 
 if (mysqli_num_rows($result) > 0) {
-    $users_appointments_table .= "<table><caption>Appointments table</caption><tr><th>App ID</th><th>Course ID</th><th>Tutor ID</th><th>Student ID</th><th>Appointment Date</th><th>Start Time</th><th>End Time</th><th>Status</th></tr>";
+    $users_appointments_table .= "<table><caption>Your Appointments</caption><tr><th>App ID</th><th>Course ID</th><th>Tutor ID</th><th>Student ID</th><th>Appointment Date</th><th>Start Time</th><th>End Time</th><th>Status</th></tr>";
 
 	while ($row = mysqli_fetch_assoc($result)) {
 		$users_appointments_table .= "<tr>  <td>".$row["app_id"]."</td> <td>".$row["course_id"]."</td> <td> ".$row["tutor_id"]."</td> <td>".$row["student_id"]."</td> <td>".$row["appoint_date"]."</td> <td>".$row["appoint_start_time"]."</td> <td>".$row["appoint_end_time"]."</td> <td>".$row["status"]."</td></tr>";
@@ -131,7 +99,7 @@ if (mysqli_num_rows($result) > 0) {
 }
 else //no appointments for this user
 {
-    $users_appointments_table .= "<table><caption>Appointments table</caption><tr><th>App ID</th><th>Course ID</th><th>Tutor ID</th><th>Student ID</th><th>Appointment Date</th><th>Start Time</th><th>End Time</th><th>Status</th></tr>";
+    $users_appointments_table .= "<table><caption>Your Appointments</caption><tr><th>App ID</th><th>Course ID</th><th>Tutor ID</th><th>Student ID</th><th>Appointment Date</th><th>Start Time</th><th>End Time</th><th>Status</th></tr>";
 	$users_appointments_table .= "<p>0 results</p>";
 }
 
@@ -202,46 +170,6 @@ if ($stmt = mysqli_prepare($link, $query)) {
     mysqli_stmt_close($stmt);
 }
 
-
-//not using this function right now
-function checkTutorConlicts($tutor_id, $appointment_date, $unix_start_time, $unix_end_time){
-	print_r("-----------------------------------------------");
-	print_r($tutor_id);
-	print_r($appointment_date);
-
-	$payload = "SELECT appoint_start_time, appoint_end_time FROM appointments WHERE tutor_id = '$tutor_id' AND appoint_date = '$appointment_date'";
-	$result = mysqli_query($link, $payload);
-	
-	// Tutor has appointment on that date already, check for time conflict
-	if (mysqli_num_rows($result) > 0) {
-		while ($row = mysqli_fetch_assoc($result)) {
-			$existing_start_time = strtotime($row["appoint_start_time"]);
-			$existing_end_time = strtotime($row["appoint_end_time"]);
-			
-			if ($unix_start_time >= $existing_start_time && $unix_start_time <= $existing_end_time)
-			{
-				$error = True;
-			}
-			else if ($unix_start_time <= $existing_start_time && $unix_end_time >= $existing_end_time)
-			{
-				$error = True;
-			}
-			else if ($unix_end_time >= $existing_start_time && $unix_end_time <= $existing_end_time)
-			{
-				$error = True;
-			}
-			
-			if ($error)
-			{
-				echo '<script type="text/javascript">
-			   window.onload = function () { alert("Sorry, the tutor has a conflicting appointment at your selected time"); } 
-				</script>';	
-				break;
-			}
-		}
-	}
-}
-
 // ADDING APPOINTMENT FOR USER
 if (isset($_POST['add_appointment'])) { 
     echo ("Got to appt backend!");
@@ -262,28 +190,41 @@ if (isset($_POST['add_appointment'])) {
      $result = mysqli_query($link, $query);
      $tutor_id = mysqli_fetch_assoc($result)["user_id"];
 	
+	 
+	$error = False;
+	$errorMessage = "";
 
     // CHECK IF TIME IS VALID
 	$unix_start_time = strtotime($start_time);
 	$unix_end_time = strtotime($end_time);
 	
-	// CHECK IF DATE IS CHOSEN IS BEFORE CURRENT DAY
-	$error = checkValidDateTime($appointment_date, $unix_start_time, $unix_end_time);
-	
-// CHECK IF TUTOR HAS AN APPOINTMENT ON THE SAME DAY WITH CONFLICTING TIMES
-	// Conditions for failure:
-	// Same date && appointment exists on that date already &&
-	// (start_time >= existing_start_time && start_time <= existing_end_time) || << starts after existing and before it ends
-	// (start_time <= existing_start_time && end_time >= existing_end_time) || << envelops
-	// (end_time >= existing_start_time && end_time <= existing_end_time) << end after existing starts and before it ends
-	// $error = checkTutorConlicts($tutor_id, $appointment_date, $unix_start_time, $unix_end_time);
+	if ($unix_start_time >= $unix_end_time)
+	{
+		echo '<script type="text/javascript">
+		   window.onload = function () { alert("Sorry, your end time cannot be equal or less than your start time"); } 
+			</script>';	
+		$error = True;
+	}
 
+
+    // CHECK IF DATE IS CHOSEN IS BEFORE CURRENT DAY
+    if (strtotime($appointment_date) <= strtotime('now'))
+    {
+        echo '<script type="text/javascript">
+        window.onload = function () { alert("Sorry, your appointment date cannot be before today."); } 
+            </script>';	
+        $error = True;
+    }	
+
+// CHECK IF TUTOR HAS AN APPOINTMENT ON THE SAME DAY WITH CONFLICTING TIMES
+	
 	$payload = "SELECT appoint_start_time, appoint_end_time FROM appointments WHERE tutor_id = '$tutor_id' AND appoint_date = '$appointment_date'";
 	$result = mysqli_query($link, $payload);
 	
 	// Tutor has appointment on that date already, check for time conflict
 	if (mysqli_num_rows($result) > 0) {
 		while ($row = mysqli_fetch_assoc($result)) {
+			$error = False;
 			$existing_start_time = strtotime($row["appoint_start_time"]);
 			$existing_end_time = strtotime($row["appoint_end_time"]);
 			
@@ -312,18 +253,15 @@ if (isset($_POST['add_appointment'])) {
 
     
 	// CHECK IF STUDENT HAS AN APPOINTMENT ON THE SAME DAY WITH CONFLICTING TIMES
-	// Conditions for failure:
-	// Same date && appointment exists on that date already &&
-	// (start_time >= existing_start_time && start_time <= existing_end_time) || << starts after existing and before it ends
-	// (start_time <= existing_start_time && end_time >= existing_end_time) || << envelops
-	// (end_time >= existing_start_time && end_time <= existing_end_time) << end after existing starts and before it ends
 	
 	$payload = "SELECT appoint_start_time, appoint_end_time FROM appointments WHERE student_id = '$student_id' AND appoint_date = '$appointment_date'";
 	$result = mysqli_query($link, $payload);
 	
 	// Student has appointment on that date already, check for time conflict
 	if (mysqli_num_rows($result) > 0) {
+		$error = False;
 		while ($row = mysqli_fetch_assoc($result)) {
+			$error = False;
 			$existing_start_time = strtotime($row["appoint_start_time"]);
 			$existing_end_time = strtotime($row["appoint_end_time"]);
 			
@@ -368,7 +306,6 @@ if (isset($_POST['add_appointment'])) {
 // UPDATING APPOINTMENT DATE FOR USER
 if (isset($_POST['update_date'])) { 
 
-	print_r("got to update function------");
     $apptToUpdate = mysqli_real_escape_string($link, $_POST['apptToUpdate']);
     $updatedDate = mysqli_real_escape_string($link, $_POST['updatedDate']);
     // $appointment_date = date('Y-m-d', strtotime($_POST['availDate']));
@@ -389,20 +326,18 @@ if (isset($_POST['update_date'])) {
 		mysqli_stmt_close($stmt);
 	}
 
-	// print("App ID-----------: ");
-	// print_r($app_id);
-	// print("Tutor ID---------------: ");
-	// print_r($tutor_id);
-	// print("Date: ------------ ");
-	// print($appointment_date);
-	// print("Start Time-------------------: ");
-	// print_r($start_time);
-	// print("End Time-------------------: ");
-	// print_r($end_time);
+	
+	$error = False;
+	$errorMessage = "";
 
-    //check if date is before current date
-	// print_r($updatedDate);
-   	$error = checkValidDate($updatedDate);
+    // CHECK IF DATE IS CHOSEN IS BEFORE CURRENT DAY
+    if (strtotime($updatedDate) <= strtotime('now'))
+    {
+        echo '<script type="text/javascript">
+        window.onload = function () { alert("Sorry, your appointment date cannot be before today."); } 
+            </script>';	
+        $error = True;
+    }
 
 	$unix_start_time = strtotime($start_time);
 	$unix_end_time = strtotime($end_time);
@@ -415,6 +350,7 @@ if (isset($_POST['update_date'])) {
 	// Tutor has appointment on that date already, check for time conflict
 	if (mysqli_num_rows($result) > 0) {
 		while ($row = mysqli_fetch_assoc($result)) {
+			$error = False;
 			$existing_start_time = strtotime($row["appoint_start_time"]);
 			$existing_end_time = strtotime($row["appoint_end_time"]);
 			
@@ -450,6 +386,7 @@ if (isset($_POST['update_date'])) {
 	// Student has appointment on that date already, check for time conflict
 	if (mysqli_num_rows($result) > 0) {
 		while ($row = mysqli_fetch_assoc($result)) {
+			$error = False;
 			$existing_start_time = strtotime($row["appoint_start_time"]);
 			$existing_end_time = strtotime($row["appoint_end_time"]);
 			
@@ -487,26 +424,140 @@ if (isset($_POST['update_date'])) {
 			echo("Error description: " . mysqli_error($link));
 		}
 		
-		// header('Location: userAppointment.php');
+		header('Location: userAppointment.php');
 	}
 }
 
-//UPDATING APPOINTMENT START TIME FOR USER
-if (isset($_POST['update_start_time'])) { 
 
-	print_r("got to update function------");
+// UPDATING APPOINTMENT TIMES FOR USER
+if (isset($_POST['update_times'])) { 
+
     $apptToUpdate = mysqli_real_escape_string($link, $_POST['apptToUpdate']);
-    $updatedDate = mysqli_real_escape_string($link, $_POST['updatedDate']);
-    // $appointment_date = date('Y-m-d', strtotime($_POST['availDate']));
+    $new_end_time = date('H:i:s', strtotime($_POST['newEndTime']));
+	$new_start_time = date('H:i:s', strtotime($_POST['newStartTime']));
 
+    $index = strpos($apptToUpdate, "Date");
+    $length = $index-10;
+    $app_id = substr($apptToUpdate, 8, $length);
+
+    //get all other details for appointment from app_id
+    $query = "SELECT * from appointments WHERE app_id='$app_id'";
+    $result = mysqli_query($link, $query);
+	
+	if ($stmt = mysqli_prepare($link, $query)) {
+		mysqli_stmt_execute($stmt);
+		mysqli_stmt_bind_result($stmt, $app_id, $course_id, $tutor_id, $student_id, $appointment_date, $start_time, $end_time, $status);
+		while (mysqli_stmt_fetch($stmt)) {}
+		mysqli_stmt_close($stmt);
+	}
+
+	$error = False;
+	$errorMessage = "";
+	
+	// CHECK IF TIME IS VALID
+	$unix_start_time = strtotime($new_start_time);
+	$unix_end_time = strtotime($new_end_time);
+	
+	if ($unix_start_time >= $unix_end_time)
+	{
+		echo '<script type="text/javascript">
+		   window.onload = function () { alert("Sorry, your end time cannot be equal or less than your start time"); } 
+			</script>';	
+		$error = True;
+	}
+
+// CHECK IF TUTOR HAS AN APPOINTMENT ON THE SAME DAY WITH CONFLICTING TIMES
+
+	$payload = "SELECT appoint_start_time, appoint_end_time FROM appointments WHERE tutor_id = '$tutor_id' AND appoint_date = '$appointment_date' AND app_id != '$app_id'";
+	$result = mysqli_query($link, $payload);
+	
+	// Tutor has appointment on that date already, check for time conflict
+	if (mysqli_num_rows($result) > 0) {
+		while ($row = mysqli_fetch_assoc($result)) {
+			$existing_start_time = strtotime($row["appoint_start_time"]);
+			$existing_end_time = strtotime($row["appoint_end_time"]);
+			
+			if ($unix_start_time >= $existing_start_time && $unix_start_time <= $existing_end_time)
+			{
+				$error = True;
+			}
+			else if ($unix_start_time <= $existing_start_time && $unix_end_time >= $existing_end_time)
+			{
+				$error = True;
+			}
+			else if ($unix_end_time >= $existing_start_time && $unix_end_time <= $existing_end_time)
+			{
+				$error = True;
+			}
+			
+			if ($error)
+			{
+				echo '<script type="text/javascript">
+			   window.onload = function () { alert("Sorry, the tutor has a conflicting appointment at your selected time"); } 
+				</script>';	
+				break;
+			}
+		}
+	}
+
+    
+	// CHECK IF STUDENT HAS AN APPOINTMENT ON THE SAME DAY WITH CONFLICTING TIMES
+	
+	$payload = "SELECT appoint_start_time, appoint_end_time FROM appointments WHERE student_id = '$student_id' AND appoint_date = '$appointment_date' AND app_id != '$app_id'";
+	$result = mysqli_query($link, $payload);
+	
+	// Student has appointment on that date already, check for time conflict
+	if (mysqli_num_rows($result) > 0) {
+		while ($row = mysqli_fetch_assoc($result)) {
+			$existing_start_time = strtotime($row["appoint_start_time"]);
+			$existing_end_time = strtotime($row["appoint_end_time"]);
+			
+			if ($unix_start_time >= $existing_start_time && $unix_start_time <= $existing_end_time)
+			{
+				$error = True;
+			}
+			else if ($unix_start_time <= $existing_start_time && $unix_end_time >= $existing_end_time)
+			{
+				$error = True;
+			}
+			else if ($unix_end_time >= $existing_start_time && $unix_end_time <= $existing_end_time)
+			{
+				$error = True;
+			}
+			
+			if ($error)
+			{
+				echo '<script type="text/javascript">
+			   window.onload = function () { alert("Sorry, you have a conflicting appointment at the selected time"); } 
+				</script>';	
+				break;
+			}
+		}
+	}
+	
+	if (!$error) //if no errors, insert into DB
+	{
+		print_r("got here");
+		$payload = "UPDATE appointments SET appoint_end_time='$new_end_time', appoint_start_time='$new_start_time' WHERE app_id='$app_id'";
+		
+		if (!mysqli_query($link, $payload))
+		{
+			echo("Error description: " . mysqli_error($link));
+		}
+		
+		header('Location: userAppointment.php');
+	}
+   	
 }
+
+
 // DELETING APPOINTMENT FOR USER
 if (isset($_POST['delete_appointment'])) { 
     echo ("Got to delete appt backend!");
     $apptToDelete = mysqli_real_escape_string($link, $_POST['apptToDelete']);
 
     //getting the appointment id:
-    $index = strpos($apptToDelete, "date");
+    $index = strpos($apptToDelete, "Date");
     $length = $index-10;
     $app_id = substr($apptToDelete, 8, $length);
     print_r($app_id);
