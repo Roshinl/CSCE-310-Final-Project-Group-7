@@ -108,6 +108,18 @@ if (mysqli_num_rows($result) > 0) {
     $cart_table .= "<p><b>You currently have no courses in your cart.</b></p>";
 }
 
+// PROCEED TO CHECKOUT
+if (isset($_POST['go_to_checkout'])) {
+    $payload = "SELECT * FROM cart WHERE user_id = '".$_SESSION['user_id']."'";
+    $execute = mysqli_query($link, $payload);
+
+    if (mysqli_num_rows($execute) > 0) { // checks if shopping cart is empty or not; user is taken to checkout window if their cart isn't empty
+        header('Location: coursePayment.php');
+    } else {
+        header('Location: courses.php');
+    }
+}
+
 // PAY FOR COURSE(S)
 if (isset($_POST['checkout'])) {
 	$card_type = mysqli_real_escape_string($link, $_POST['card_type']);

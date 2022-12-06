@@ -71,7 +71,7 @@ table, th, td {
     </br>
 
     <form method="post" action="coursePayment.php">
-        <input type="submit" value="Checkout">
+        <input type="submit" value="Checkout" name="go_to_checkout">
     </form>
 
     </br>
