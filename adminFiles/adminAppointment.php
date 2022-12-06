@@ -318,11 +318,12 @@ editable things should be appointment date/times !-->
 	</select>
 
 	</br>
-	<label>Change the appointment from ongoing (1) to finished (0)</label>
+	<label>Change the appointment's status (2 = unpaid, 1 = paid/ongoing, 0 = finished)</label>
 	<select name = "new_status">
 		<option value = ""></option>
 		<option value = 0>0</option>
 		<option value = 1>1</option>
+		<option value = 2>2</option>
 	</select>
 	
 	<button type="submit" class="btn" name="edit_appointment">Submit</button>
