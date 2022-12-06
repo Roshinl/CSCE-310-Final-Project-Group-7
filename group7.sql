@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Dec 04, 2022 at 11:20 PM
+-- Generation Time: Dec 06, 2022 at 06:57 AM
 -- Server version: 5.7.24
 -- PHP Version: 8.0.1
 
@@ -36,7 +36,7 @@ CREATE TABLE `appointments` (
   `appoint_start_time` time NOT NULL,
   `appoint_end_time` time NOT NULL,
   `description` text,
-  `status` tinyint(1) NOT NULL DEFAULT '1'
+  `status` tinyint(1) NOT NULL DEFAULT '2'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -45,7 +45,7 @@ CREATE TABLE `appointments` (
 
 INSERT INTO `appointments` (`app_id`, `course_id`, `tutor_id`, `student_id`, `appoint_date`, `appoint_start_time`, `appoint_end_time`, `description`, `status`) VALUES
 (1, 1, 5, 1, '2022-12-14', '13:00:00', '15:00:00', NULL, 0),
-(3, 1, 6, 4, '2022-12-28', '10:00:00', '15:00:00', NULL, 1),
+(3, 1, 6, 4, '2022-12-28', '15:00:00', '17:00:00', NULL, 1),
 (4, 1, 6, 4, '2022-12-19', '09:00:00', '10:00:00', NULL, 0),
 (5, 1, 5, 1, '2022-12-28', '11:00:00', '13:00:00', NULL, 1);
 
@@ -82,6 +82,36 @@ CREATE TABLE `appointments_table_with_names` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `cart`
+--
+
+CREATE TABLE `cart` (
+  `cart_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `course_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `cart`
+--
+
+INSERT INTO `cart` (`cart_id`, `user_id`, `course_id`) VALUES
+(1, 4, 1),
+(2, 1, 1);
+
+--
+-- Triggers `cart`
+--
+DELIMITER $$
+CREATE TRIGGER `increment_cart_id` BEFORE INSERT ON `cart` FOR EACH ROW BEGIN
+	SET NEW.cart_id = (SELECT IFNULL(MAX(cart_id),0) + 1 FROM cart);
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `courses`
 --
 
@@ -104,7 +134,7 @@ INSERT INTO `courses` (`course_id`, `course_name`, `course_num`, `course_desc`) 
 --
 DELIMITER $$
 CREATE TRIGGER `increment_course_id` BEFORE INSERT ON `courses` FOR EACH ROW BEGIN
-	SET NEW.course_id = (SELECT IFNULL(MAX(course_id),0) + 1 FROM appointments);
+	SET NEW.course_id = (SELECT IFNULL(MAX(course_id),0) + 1 FROM courses);
 END
 $$
 DELIMITER ;
@@ -131,7 +161,9 @@ CREATE TABLE `payment_info` (
 
 INSERT INTO `payment_info` (`payment_id`, `user_id`, `card_type`, `card_num`, `CVV`, `zip_code`, `exp_date`) VALUES
 (1, 1, 'American Express', '123', '123', '123', '2022-11-01'),
-(2, 4, 'Mastercard', '999', '888', '53453', '2022-12-30');
+(2, 4, 'Mastercard', '999', '888', '53453', '2022-12-30'),
+(3, 1, 'VISA', '556', '121', '54554', '2022-12-01'),
+(4, 1, 'VISA', '567', '888', '999', '2022-12-15');
 
 --
 -- Triggers `payment_info`
@@ -158,6 +190,14 @@ CREATE TABLE `reviews` (
   `num_stars` int(11) NOT NULL,
   `review_date_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `reviews`
+--
+
+INSERT INTO `reviews` (`review_id`, `app_id`, `user_id`, `content`, `num_stars`, `review_date_time`) VALUES
+(1, 1, 4, 'Test3', 1, '2022-12-04 17:44:17'),
+(2, 4, 4, 'Test3', 3, '2022-12-04 17:44:25');
 
 --
 -- Triggers `reviews`
@@ -204,7 +244,8 @@ CREATE TABLE `student` (
 
 INSERT INTO `student` (`user_id`, `has_payment`) VALUES
 (1, 1),
-(4, 1);
+(4, 1),
+(7, 0);
 
 -- --------------------------------------------------------
 
@@ -251,7 +292,8 @@ INSERT INTO `user` (`user_id`, `password`, `user_fname`, `user_lname`, `username
 (1, '123', 'jason', 'lai', 'jasonlai', 'jasonlai@cringe.com', 0),
 (4, '123', '123', '123', '123', '1234', 0),
 (5, '123', 'John', 'Smith', 'johnsmith', 'johnsmith@email.com', 1),
-(6, '123', 'Jane', 'Doe', 'janedoe', 'janedoe@email.com', 1);
+(6, '123', 'Jane', 'Doe', 'janedoe', 'janedoe@email.com', 1),
+(7, '1234', '1234', '1234', '1234', '1234@abcd.com', 0);
 
 --
 -- Triggers `user`
@@ -282,6 +324,19 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
+-- Stand-in structure for view `user_cart`
+-- (See below for the actual view)
+--
+CREATE TABLE `user_cart` (
+`user_id` int(11)
+,`course_id` int(11)
+,`course_name` text
+,`course_num` int(11)
+);
+
+-- --------------------------------------------------------
+
+--
 -- Structure for view `appointments_table_with_names`
 --
 DROP TABLE IF EXISTS `appointments_table_with_names`;
@@ -297,6 +352,15 @@ DROP TABLE IF EXISTS `reviews_table_with_names`;
 
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `reviews_table_with_names`  AS SELECT `reviews`.`review_id` AS `review_id`, `reviews`.`app_id` AS `app_id`, `reviews`.`content` AS `content`, `reviews`.`num_stars` AS `num_stars`, `reviews`.`review_date_time` AS `review_date_time`, `appointments`.`tutor_id` AS `tutor_id`, `foo`.`user_fname` AS `tutor_fname`, `foo`.`user_lname` AS `tutor_lname`, `courses`.`course_name` AS `course_name` FROM (((`reviews` join `appointments` on((`reviews`.`app_id` = `appointments`.`app_id`))) join `courses`) join `user` `foo` on((`appointments`.`tutor_id` = `foo`.`user_id`)))  ;
 
+-- --------------------------------------------------------
+
+--
+-- Structure for view `user_cart`
+--
+DROP TABLE IF EXISTS `user_cart`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `user_cart`  AS SELECT `cart`.`user_id` AS `user_id`, `cart`.`course_id` AS `course_id`, `courses`.`course_name` AS `course_name`, `courses`.`course_num` AS `course_num` FROM (`cart` join `courses` on((`cart`.`course_id` = `courses`.`course_id`)))  ;
+
 --
 -- Indexes for dumped tables
 --
@@ -309,6 +373,14 @@ ALTER TABLE `appointments`
   ADD KEY `appointments_ibfk_1` (`course_id`),
   ADD KEY `appointments_ibfk_2` (`tutor_id`),
   ADD KEY `appointments_ibfk_3` (`student_id`);
+
+--
+-- Indexes for table `cart`
+--
+ALTER TABLE `cart`
+  ADD PRIMARY KEY (`cart_id`),
+  ADD KEY `course_id` (`course_id`),
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Indexes for table `courses`
@@ -361,6 +433,13 @@ ALTER TABLE `appointments`
   ADD CONSTRAINT `appointments_ibfk_1` FOREIGN KEY (`course_id`) REFERENCES `courses` (`course_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `appointments_ibfk_2` FOREIGN KEY (`tutor_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `appointments_ibfk_3` FOREIGN KEY (`student_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `cart`
+--
+ALTER TABLE `cart`
+  ADD CONSTRAINT `cart_ibfk_1` FOREIGN KEY (`course_id`) REFERENCES `courses` (`course_id`),
+  ADD CONSTRAINT `cart_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`);
 
 --
 -- Constraints for table `payment_info`
