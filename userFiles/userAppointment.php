@@ -167,20 +167,14 @@ table, th, td {
 </select> 
 
 </form>
-<p> Update Date: </p> 
-<!-- When choosing a new date, make sure that the new date and old time for that tutor and course is not already in the database -->
-<input type = "date" name = "updatedDate">
 
+<p> Update Date: </p> 
+<input type = "date" name = "updatedDate">
 <button type="submit" class="btn" name="update_date">Update Date</button>
 
-</form>
 
+ <p> Update Start Time: </p>
 
-
-<p> Update Start Time: </p>
-<!-- When choosing a new time, make sure that the new time and old date for that tutor and course is not already in the database -->
-
-<form method="post" action="userAppointment.php">
 <select name="newStartTime">
 <option value=""> --Choose a New Start Time-- </option>
 		<?php
@@ -197,16 +191,10 @@ table, th, td {
 			endwhile;
 		?>
 </select>
-<input name="update_start_time" type="submit" value="Update Start Time">
-
-</form>
-
 
 
 <p> Update End Time: </p>
-<!-- When choosing a new time, make sure that the new time and old date for that tutor and course is not already in the database -->
 
-<form method="post" action="userAppointment.php">
 <select name="newEndTime">
 <option value=""> --Choose a End Start Time-- </option>
 		<?php
@@ -223,9 +211,7 @@ table, th, td {
 			endwhile;
 		?>
 </select>
-<input name="update_end_time" type="submit" value="Update End Time">
-
-</form>
+<button type="submit" class="btn" name="update_times">Update Times</button>
 
 
 
