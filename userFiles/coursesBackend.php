@@ -50,8 +50,7 @@ if (mysqli_num_rows($result) > 0) {
 }
 
 // GET COURSE IDS FOR DROP DOWN
-// TODO: Only display courses which they have unpaid or ongoing appointments for
-$payload = "SELECT DISTINCT course_id FROM appointments WHERE (`status` = 1 OR `status` = 2) AND student_id = '".$_SESSION['user_id']."'";
+$payload = "SELECT DISTINCT course_id FROM appointments WHERE (`status` = 1 OR `status` = 2) AND course_id NOT IN (SELECT course_id from cart) AND student_id = '".$_SESSION['user_id']."'";
 $course_ids = mysqli_query($link, $payload);
 
 // ADD COURSES TO CART
