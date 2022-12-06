@@ -237,6 +237,7 @@ table, th, td {
 <!-- <button type="submit" class="btn" name="delete_appointment">Delete appointment</button> -->
 
 
+<p>Click here to go back to the home page <a href = "userHomePage.php">Click here</a></p>
 
 </body>
 </html>
