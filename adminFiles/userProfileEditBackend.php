@@ -16,23 +16,22 @@ if($link === false){
     die("ERROR: Could not connect. " . mysqli_connect_error());
 }
 
-// DISPLAYS THE STUDENT TABLE FOR ADMINS TO EDIT PROFILE - TABLE
+// DISPLAYS THE STUDENTS AND TUTORS TABLE FOR ADMINS TO EDIT PROFILE - TABLE
 
 $user_table = "";
-$availableUsers = array();
+$availableUsers = array(); //students and tutors
 
 $payload = "SELECT user_id, user_fname, user_lname, username, password, email FROM user WHERE is_tutor='0' OR is_tutor='1'"; //they are a student or tutor
 $result = mysqli_query($link, $payload);
 
 if (mysqli_num_rows($result) > 0) {
-    $user_table .= "<table><caption>User Profile Details</caption><tr><th>ID</th><th>Name</th><th>Username</th><th>Password</th><th>Email</th></tr>";
+    $user_table .= "<table><caption>Student/Tutor Profile Details</caption><tr><th>ID</th><th>Name</th><th>Username</th><th>Password</th><th>Email</th></tr>";
 
 	while ($row = mysqli_fetch_assoc($result)){
 	    $user_table .= "<tr><td>".$row["user_id"]."</td><td>".$row["user_fname"]." ".$row["user_lname"]."</td><td>".$row["username"]."</td><td>".$row["password"]."</td><td>".$row["email"]."</td></tr>";
         $availableUsers[] = $row["user_id"];
     }
     $user_table .= "</table>";
-
 }
 else 
 {
@@ -41,35 +40,30 @@ else
 }
 
 
+// DISPLAYS THE STUDENTS' PAYMENT INFO FOR ADMIN TO VIEW
+$student_payment_table = "";
+$availableStudents = array();
 
-
-// DISPLAYS THE PAYMENT TABLE
-
-$payment_table = ""; // append HTML code to this string. The HTML will then run this code and display the table
-
-$payload = "SELECT payment_id, card_type, card_num, CVV, zip_code, exp_date FROM payment_info WHERE user_id = '".$_SESSION['user_id']."'";
+$payload = "SELECT user_id, payment_id, user_fname, user_lname, username, card_type, card_num, CVV, zip_code, exp_date FROM user_table_with_paymentinfo";
 $result = mysqli_query($link, $payload);
 
 if (mysqli_num_rows($result) > 0) {
-	$payment_table .= "<table><caption>Your payment information</caption><tr><th>Payment ID</th><th>Card type</th><th>Card number</th><th>CVV</th><th>Zip code</th><th>Expiry date</th></tr>";
-	while ($row = mysqli_fetch_assoc($result)) {
-		$payment_table .= "<tr><td>".$row["payment_id"]."</td><td>".$row["card_type"]."</td><td>".$row["card_num"]."</td><td>".$row["CVV"]."</td><td>".$row["zip_code"]."</td><td>".$row["exp_date"]."</td></tr>";
-	}
-	$payment_table .= "</table>";
+    $student_payment_table .= "<table><caption>Student Payment Information</caption><tr><th>User ID</th><th>Payment ID</th><th>Name</th><th>Username</th><th>Card Type</th><th>Card Number</th><th>CVV</th><th>Zip Code</th><th>Expiration Date</th></tr>";
+
+	while ($row = mysqli_fetch_assoc($result)){
+	    $student_payment_table .= "<tr><td>".$row["user_id"]."</td><td>".$row["payment_id"]."</td><td>".$row["user_fname"]." ".$row["user_lname"]."</td><td>".$row["username"]."</td><td>".$row["card_type"]."</td><td>".$row["card_num"]."</td><td>".$row["CVV"]."</td><td>".$row["zip_code"]."</td><td>".$row["exp_date"]."</td></tr>";
+        $availableStudents[] = $row["user_id"];
+    }
+    $student_payment_table .= "</table>";
+
 }
 else 
 {
-	$payment_table .= "<table><tr><th>Payment ID</th><th>Card type</th><th>Card number</th><th>CVV</th><th>Zip code</th><th>Expiry date</th></tr></table>";
-	$payment_table .= "<p>0 results</p>";
+	$student_payment_table .= "<tr><td>".$row["user_id"]."</td><td>".$row["payment_id"]."</td><td>".$row["user_fname"]." ".$row["user_lname"]."</td><td>".$row["username"]."</td><td>".$row["card_type"]."</td><td>".$row["card_num"]."</td><td>".$row["CVV"]."</td><td>".$row["zip_code"]."</td><td>".$row["exp_date"]."</td></tr>";
+	$student_tastudent_payment_tableble .= "<p>0 results</p>";
 }
 
-// DISPLAY PAYMENT IDS FOR DROP DOWN (DYNAMIC)
-
-$payload = "SELECT payment_id FROM payment_info WHERE user_id = '".$_SESSION['user_id']."'";
-$display_paymentID = mysqli_query($link, $payload); // this is passed to HTML, which loops + prints the information
-
 // CHANGING PROFILE FIELDS
-
 
 if (isset($_POST['edit_fname'])) {
 	$chosenUserID = mysqli_real_escape_string($link, $_POST['availUser']);
@@ -88,6 +82,7 @@ if (isset($_POST['edit_lname'])) {
 }
 
 if (isset($_POST['edit_username'])) {
+	$chosenUserID = mysqli_real_escape_string($link, $_POST['availUser']);
 	$username = mysqli_real_escape_string($link, $_POST['username']);
 	
 	$payload = "SELECT * FROM user WHERE username = '$username' LIMIT 1";
@@ -110,13 +105,12 @@ if (isset($_POST['edit_username'])) {
 	{
 		$payload = "UPDATE user SET username = '$username' WHERE user_id = '$chosenUserID'";
 		$execute = mysqli_query($link, $payload);
-		$_SESSION['username'] = $username; // Update the username to the new username
 		header('Location: userProfileEdit.php');
 	}
-	
 }
 
 if (isset($_POST['edit_password'])) {
+	$chosenUserID = mysqli_real_escape_string($link, $_POST['availUser']);
 	$password = mysqli_real_escape_string($link, $_POST['password']);
 	$payload = "UPDATE user SET password = '$password' WHERE user_id = '$chosenUserID'";
 	$execute = mysqli_query($link, $payload);
@@ -124,6 +118,7 @@ if (isset($_POST['edit_password'])) {
 }
 
 if (isset($_POST['edit_email'])) {
+	$chosenUserID = mysqli_real_escape_string($link, $_POST['availUser']);
 	$email = mysqli_real_escape_string($link, $_POST['email']);
 	
 	$payload = "SELECT * FROM user WHERE email = '$email' LIMIT 1";
@@ -154,6 +149,7 @@ if (isset($_POST['edit_email'])) {
 // ADDING PAYMENT INFORMATION
 
 if (isset($_POST['add_payment'])) {
+	$chosenUserID = mysqli_real_escape_string($link, $_POST['availUser']);
 	$card_type = mysqli_real_escape_string($link, $_POST['card_type']);
 	$card_num = mysqli_real_escape_string($link, $_POST['card_num']);
 	$cvv = mysqli_real_escape_string($link, $_POST['cvv']);
@@ -202,48 +198,80 @@ if (isset($_POST['add_payment'])) {
 	
 	if (!$error)
 	{
-		$payload = "INSERT INTO payment_info (user_id, card_type, card_num, CVV, zip_code, exp_date) VALUES('".$_SESSION['user_id']."',
+		$payload = "INSERT INTO payment_info (user_id, card_type, card_num, CVV, zip_code, exp_date) VALUES('$chosenUserID',
 		'$card_type','$card_num','$cvv','$zip_code','$expiry')";
 
 		if (!mysqli_query($link, $payload))
 		{
 			echo("Error description: " . mysqli_error($link));
 		}
+
+		//since student has any payment methods, set payment_method to 1
+		$payload = "UPDATE student SET has_payment = '1' WHERE user_id = '$chosenUserID'";
+		$execute = mysqli_query($link, $payload);
 		
 		header('Location: userProfileEdit.php');
 	}
 }
 
+
+//VIEWING PAYMENT IDS
+$payment_table = "";
+
+if (isset($_POST['view_payment'])) {
+	$chosenUserID = mysqli_real_escape_string($link, $_POST['availUser']);
+	$_SESSION['chosenUserID'] = $chosenUserID;
+	// print_r($chosenUserID);
+
+	$payload = "SELECT payment_id, card_type, card_num, CVV, zip_code, exp_date FROM payment_info WHERE user_id = '$chosenUserID'";
+	$result = mysqli_query($link, $payload);
+
+	if (mysqli_num_rows($result) > 0) {
+		$payment_table .= "<table><caption>User's payment information</caption><tr><th>Payment ID</th><th>Card type</th><th>Card number</th><th>CVV</th><th>Zip code</th><th>Expiry date</th></tr>";
+		while ($row = mysqli_fetch_assoc($result)) {
+			$payment_table .= "<tr><td>".$row["payment_id"]."</td><td>".$row["card_type"]."</td><td>".$row["card_num"]."</td><td>".$row["CVV"]."</td><td>".$row["zip_code"]."</td><td>".$row["exp_date"]."</td></tr>";
+		}
+		$payment_table .= "</table>";
+	}
+	else 
+	{
+		$payment_table .= "<table><tr><th>Payment ID</th><th>Card type</th><th>Card number</th><th>CVV</th><th>Zip code</th><th>Expiry date</th></tr></table>";
+		$payment_table .= "<p>0 results</p>";
+	}
+	// header('Location: userProfileEdit.php');
+
+}
 // DELETING PAYMENT ID
 
 if (isset($_POST['delete_payment_id'])) {
-	$to_delete_id = mysqli_real_escape_string($link, $_POST['selected_paymentID']);
-	
-	$payload = "DELETE FROM payment_info WHERE payment_id = '$to_delete_id'";
+	// $chosenUserID = mysqli_real_escape_string($link, $_POST['availUser']);
+	$chosen_payment_id = mysqli_real_escape_string($link, $_POST['chosen_payment_id']);
+	$payload = "DELETE FROM payment_info WHERE payment_id = '$chosen_payment_id'";
 	$execute = mysqli_query($link, $payload);
 	
-	$payload = "SELECT payment_id, card_type, card_num, CVV, zip_code, exp_date FROM payment_info WHERE user_id = '".$_SESSION['user_id']."'";
+	$payload = "SELECT payment_id, card_type, card_num, CVV, zip_code, exp_date FROM payment_info WHERE user_id = '".$_SESSION['chosenUserID']."'";
 	$result = mysqli_query($link, $payload);
 	
 	// Checks if the user has any payment information left, if they don't, we set their has_payment to 0
 	if (mysqli_num_rows($result) <= 0)
 	{
-		$payload = "UPDATE student SET has_payment = 0 WHERE user_id = '".$_SESSION['user_id']."'";
+		$payload = "UPDATE student SET has_payment = '0' WHERE user_id = '".$_SESSION['chosenUserID']."'";
 		$execute = mysqli_query($link, $payload);
 	}
-	
 	header('Location: userProfileEdit.php');
+
 }
 
 // DELETING ACCOUNT
 
 if (isset($_POST['delete_account'])) {
-	$payload = "DELETE FROM user WHERE user_id = '".$_SESSION['user_id']."'";
+	$chosenUserID = mysqli_real_escape_string($link, $_POST['availUser']);
+	$payload = "DELETE FROM user WHERE user_id = '$chosenUserID'";
 	$execute = mysqli_query($link, $payload);
 	
 	session_reset(); // resets session (so username and id aren't carried over)
 	
-	header('Location: login.php');
+	header('Location: userProfileEdit.php');
 }
 
 mysqli_close($link);
