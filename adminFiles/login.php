@@ -13,7 +13,7 @@
 	<input type="text" required name="password">
 	
 	</br>
-	<button type="submit" class="btn" name="login_user">Login</button>
+	<button type="submit" class="btn" name="login_admin">Login</button>
 	
 	</br>
 	</br>
