@@ -53,13 +53,13 @@
 	
 	</br>
 
-	<label>  Is this tutor an admin? </label>
+	<!-- <label>  Is this tutor an admin? </label>
     
 	<select name="isAdmin">
 		<option value="Yes"> Yes  </option>
 		<option value="No"> No  </option>
 
-	</select> 
+	</select>  -->
 
 	<br>
 	<button type="submit" class="btn" name="register_tutor">Register</button>
@@ -67,6 +67,7 @@
 </form>
 </br>
 </br>
+<p>Click here to go back to the home page <a href = "adminHomePage.php">Click here</a></p>
 
 </body>
 
