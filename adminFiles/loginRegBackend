@@ -151,16 +151,16 @@ if (isset($_POST['register_tutor'])) {
 	$fname = mysqli_real_escape_string($link, $_POST['fname']);
 	$lname = mysqli_real_escape_string($link, $_POST['lname']);
 	$email = mysqli_real_escape_string($link, $_POST['email']);
-	$isAdmin = mysqli_real_escape_string($link, $_POST['isAdmin']);
+	// $isAdmin = mysqli_real_escape_string($link, $_POST['isAdmin']);
 
-	print_r($isAdmin);
+	// print_r($isAdmin);
 
-	if ($isAdmin == "Yes"){
-		$isAdmin = 1;
-	}
-	else{
-		$isAdmin = 0;
-	}
+	// if ($isAdmin == "Yes"){
+	// 	$isAdmin = 1;
+	// }
+	// else{
+	// 	$isAdmin = 0;
+	// }
 
 
 
@@ -205,19 +205,19 @@ if (isset($_POST['register_tutor'])) {
 		{
 			echo("Error description: " . mysqli_error($link));
 		}
-		if ($isAdmin){
+		// if ($isAdmin){
 			
-			//finding the user_id for the new username and adding them as an admin in the tutor table
-			$query = "SELECT user_id FROM user WHERE username = '$username' LIMIT 1";
-			$result = mysqli_query($link, $query);
-			$student_id = mysqli_fetch_assoc($result)["user_id"];
-			$payload = "UPDATE tutor SET is_admin='1' WHERE user_id='$student_id'";
+		// 	//finding the user_id for the new username and adding them as an admin in the tutor table
+		// 	$query = "SELECT user_id FROM user WHERE username = '$username' LIMIT 1";
+		// 	$result = mysqli_query($link, $query);
+		// 	$student_id = mysqli_fetch_assoc($result)["user_id"];
+		// 	$payload = "UPDATE tutor SET is_admin='1' WHERE user_id='$student_id'";
 			
-			if (!mysqli_query($link, $payload))
-		{
-			echo("Error description: " . mysqli_error($link));
-		}
-		}
+		// 	if (!mysqli_query($link, $payload))
+		// {
+		// 	echo("Error description: " . mysqli_error($link));
+		// }
+		// }
 		header('Location: registerUser.php');
 	}
 }
@@ -227,7 +227,7 @@ if (isset($_POST['register_tutor'])) {
 
 // LOGGING IN AS EXISTING USER
 
-if (isset($_POST['login_user'])) {
+if (isset($_POST['login_admin'])) {
 	$username = mysqli_real_escape_string($link, $_POST['username']);
 	$password = mysqli_real_escape_string($link, $_POST['password']);
 	
