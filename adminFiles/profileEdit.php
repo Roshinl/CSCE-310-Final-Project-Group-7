@@ -44,68 +44,7 @@ table, th, td {
 	<input type="text" required name="email">
 	<button type="submit" class="btn" name="edit_email">Submit</button>
 </form>
-</br>
-</br>
-</br>
 
-<!-- ADDING PAYMENT INFORMATION !-->
-
-<?php echo $payment_table; ?>
-
-</br>
-<form method="post" action="profileEdit.php">
-	<label>Card Type</label>
-	<select required name = "card_type">
-		<option value = ""></option>
-		<option value = "VISA">VISA</option>
-		<option value = "Mastercard">Mastercard</option>
-		<option value = "American Express">American Express</option>
-		<option value = "Discover">Discover</option>
-	</select>
-	
-	</br>
-	<label>Card number</label>
-	<input type="text" required name="card_num">
-	
-	</br>
-	<label>CVV</label>
-	<input type="text" required name="cvv">
-	
-	</br>
-	<label>Zip code</label>
-	<input type="text" required name="zip_code">
-	
-	</br>
-	<label>Expiry date</label>
-	<input type = "date" required name = "exp_date">
-	
-	</br>
-	<button type="submit" class="btn" name="add_payment">Add payment information</button>
-</form>
-
-<!-- EDITING DELETING PAYMENT INFORMATION !-->
-
-</br>
-</br>
-</br>
-<form method="post" action="profileEdit.php">
-	<label>Select a payment ID to delete</label>
-	<select required name = "selected_paymentID">
-		<option value = ""></option>
-		<?php
-			while ($indv_paymentID = mysqli_fetch_array($display_paymentID, MYSQLI_NUM)):; // grabs each row in array format
-		?>
-		<option value = "<?php echo $indv_paymentID[0];?>">
-			<?php 
-				echo $indv_paymentID[0]; // prints the payment ID
-			?>
-		</option>
-		<?php
-			endwhile;
-		?>
-	</select>
-	<input name="delete_payment_id" type="submit" value="Delete" onclick="return confirm('Are you sure?')">
-</form>
 
 <!-- DELETE YOUR ACCOUNT !-->
 
