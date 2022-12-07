@@ -36,5 +36,7 @@ JP:
 
 View called reviews_table_with_names; seen on reviews page, joins appointment, course, and user tables to display tutor names, appointment ids, and their respective reviews with all necessary data
 
+Index on user's first name and last name
+
 Roshin:
 View called user_table_with_paymentinfo joins the payment_info table with the user table to show admins the student's payment information for adding/deleting payment methods.
