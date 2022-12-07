@@ -165,7 +165,7 @@ if (isset($_POST['checkout'])) {
 		$execute = mysqli_query($link, $payload);
 	
 		if (mysqli_num_rows($execute) > 0) { // check that payment method matches one of the user's existing methods
-			$update_status = "UPDATE appointments SET `status` = 1 WHERE student_id = '".$_SESSION['user_id']."'"; // update status to indicate appointments for the course have been paid for
+			$update_status = "UPDATE appointments SET `status` = 1 WHERE course_id IN (SELECT course_id FROM cart) AND student_id = '".$_SESSION['user_id']."'"; // update status to indicate appointments for the course have been paid for
             $empty_cart = "DELETE FROM cart WHERE user_id = '".$_SESSION['user_id']."'"; // empty user's cart
 
             if (!mysqli_query($link, $update_status)) {
