@@ -338,7 +338,7 @@ editable things should be appointment date/times !-->
 	<select required name = "selected_appointment_id">
 		<option value = ""></option>
 		<?php
-			while ($indv_appointmentID = mysqli_fetch_array($appointment_ids, MYSQLI_NUM)):;
+			while ($indv_appointmentID = mysqli_fetch_array($appointment_ids1, MYSQLI_NUM)):;
 		?>
 		<option value = "<?php echo $indv_appointmentID[0];?>">
 			<?php 

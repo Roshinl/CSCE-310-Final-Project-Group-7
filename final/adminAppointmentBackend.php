@@ -53,9 +53,13 @@ $tutor_options = mysqli_query($link, $payload);
 $payload = "SELECT course_id FROM courses";
 $course_options = mysqli_query($link, $payload);
 
-// DISPLAYS THE APPOINTMENT ID OPTIONS FOR THE DROP DOWN
+// DISPLAYS THE APPOINTMENT ID OPTIONS FOR EDIT DROP DOWN
 $payload = "SELECT app_id FROM appointments";
 $appointment_ids = mysqli_query($link, $payload);
+
+// DISPLAYS THE APPOINTMENT ID OPTIONS FOR DELETE DROP DOWN
+$payload = "SELECT app_id FROM appointments";
+$appointment_ids1 = mysqli_query($link, $payload);
 
 // LIST OF VALID TIMES FOR USERS TO CHOOSE FROM
 
