@@ -2,8 +2,11 @@
 <!DOCTYPE html>
 <html>
 <head><title>Register</title></head>
-<body>
-<head>REGISTER</head>
+<body style="text-align:center;">
+	<br><br>
+    <img src="g7-logo.jpg" title="G7 Tutoring Logo" alt="logo" />
+	<h1 style="color:#3CB371;">G7 TUTORING</h1>
+	<h3>Welcome! Your place to work smarter, not harder.</h3>
 <form method="post" action="register.php">
 	<label>Username</label>
 	<input type="text" required name="username">
