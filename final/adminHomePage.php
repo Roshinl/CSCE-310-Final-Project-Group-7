@@ -11,6 +11,7 @@
 <p>Click here to update a user account profile <a href="userProfileEdit.php">Click here </a></p>
 <p>Click here to manage all appointments <a href ="adminAppointment.php">Click here</a></p>
 <p>Click here to manage all reviews <a href ="adminReview.php">Click here</a></p>
+<p>Click here to manage all courses <a href="adminCourses.php">Click here </a></p>
 
 </body>
 </html>
