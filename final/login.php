@@ -2,29 +2,26 @@
 <!DOCTYPE html>
 <html>
 <head><title>Login</title></head>
-
 <body style="text-align:center;">
 	<br><br>
     <img src="g7-logo.jpg" title="G7 Tutoring Logo" alt="logo" />
 	<h1 style="color:#3CB371;">G7 TUTORING</h1>
 	<h3>Welcome! Your place to work smarter, not harder.</h3>
+<form method="post" action="login.php">
+	<label>Username</label>
+	<input type="text" required name="username">
 	
-	<!-- <head>LOGIN</head> -->
-	<form method="post" action="login.php">
-		<label>Username</label>
-		<input type="text" required name="username">
-		
-		</br>
-		<label>Password</label>
-		<input type="text" required name="password">
-		
-		</br>
-		<button type="submit" class="btn" name="login_user">Login</button>
-		
-		</br>
-		</br>
-		<p>Register here if you don't have an account: <a href ="register.php">Register</a></p>
-	</form>
+	</br>
+	<label>Password</label>
+	<input type="text" required name="password">
+	
+	</br>
+	<button type="submit" class="btn" name="login_user">Login</button>
+	
+	</br>
+	</br>
+	<p>Register here if you don't have an account: <a href ="register.php">Register</a></p>
+</form>
 </body>
 
 <!-- PREVENTS ANNOYING RESUBMIT FORM MESSAGE FROM SHOWING UP -->
