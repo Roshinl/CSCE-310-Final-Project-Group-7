@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Dec 08, 2022 at 12:55 AM
+-- Generation Time: Dec 08, 2022 at 05:39 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.0.1
 
@@ -66,7 +66,8 @@ INSERT INTO `appointments` (`app_id`, `course_id`, `tutor_id`, `student_id`, `ap
 (6, 1, 5, 1, '2022-12-15', '10:00:00', '12:00:00', NULL, 1),
 (7, 2, 5, 1, '2022-12-27', '10:00:00', '11:00:00', NULL, 1),
 (8, 3, 8, 1, '2022-12-31', '09:00:00', '12:00:00', NULL, 2),
-(9, 2, 5, 1, '2022-12-15', '13:00:00', '14:00:00', NULL, 1);
+(9, 2, 5, 1, '2022-12-15', '13:00:00', '14:00:00', NULL, 1),
+(10, 3, 5, 1, '2022-12-31', '13:00:00', '16:00:00', NULL, 0);
 
 --
 -- Triggers `appointments`
@@ -138,7 +139,7 @@ CREATE TABLE `courses` (
 --
 
 INSERT INTO `courses` (`course_id`, `course_name`, `course_num`, `course_desc`) VALUES
-(1, 'Math for idiots', 151, 'Math for idiots. Nothing more, nothing less.'),
+(1, 'Engineering Mathematics I', 151, 'Calculus 1'),
 (2, 'Programming Studios', 315, 'Project based'),
 (3, 'Database Systems', 310, 'Databases');
 
@@ -228,6 +229,7 @@ DELIMITER ;
 CREATE TABLE `reviews_table_with_names` (
 `review_id` int(11)
 ,`app_id` int(11)
+,`user_id` int(11)
 ,`content` text
 ,`num_stars` int(11)
 ,`review_date_time` datetime
@@ -253,8 +255,7 @@ CREATE TABLE `student` (
 --
 
 INSERT INTO `student` (`user_id`, `has_payment`) VALUES
-(1, 1),
-(9, 0);
+(1, 1);
 
 -- --------------------------------------------------------
 
@@ -301,8 +302,7 @@ INSERT INTO `user` (`user_id`, `password`, `user_fname`, `user_lname`, `username
 (5, '123', 'John', 'Smith', 'johnsmith', 'johnsmith@email.com', 1),
 (6, '123', 'jane', 'doe', 'janedoe', 'janedoe@email.com', 2),
 (7, '123', 'master', 'admin', 'masteradmin', 'masteradmin@email.com', 2),
-(8, '123', 'jack', 'black', 'jack1', 'jackblack@yahoo.com', 1),
-(9, 'stu', 'stu', 'stu', 'stu', 'dtu@gmail.com', 0);
+(8, '123', 'jack', 'black', 'jack1', 'jackblack@yahoo.com', 1);
 
 --
 -- Triggers `user`
@@ -354,6 +354,21 @@ CREATE TABLE `user_cart` (
 -- --------------------------------------------------------
 
 --
+-- Stand-in structure for view `user_courses_cart`
+-- (See below for the actual view)
+--
+CREATE TABLE `user_courses_cart` (
+`user_id` int(11)
+,`course_id` int(11)
+,`course_name` text
+,`course_num` int(11)
+,`course_desc` text
+,`cart_id` int(11)
+);
+
+-- --------------------------------------------------------
+
+--
 -- Stand-in structure for view `user_table_with_paymentinfo`
 -- (See below for the actual view)
 --
@@ -386,7 +401,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `reviews_table_with_names`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `reviews_table_with_names`  AS SELECT `reviews`.`review_id` AS `review_id`, `reviews`.`app_id` AS `app_id`, `reviews`.`content` AS `content`, `reviews`.`num_stars` AS `num_stars`, `reviews`.`review_date_time` AS `review_date_time`, `appointments`.`tutor_id` AS `tutor_id`, `foo`.`user_fname` AS `tutor_fname`, `foo`.`user_lname` AS `tutor_lname`, `courses`.`course_name` AS `course_name` FROM (((`reviews` join `appointments` on((`reviews`.`app_id` = `appointments`.`app_id`))) join `courses` on((`courses`.`course_id` = `appointments`.`course_id`))) join `user` `foo` on((`appointments`.`tutor_id` = `foo`.`user_id`)))  ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `reviews_table_with_names`  AS SELECT `reviews`.`review_id` AS `review_id`, `reviews`.`app_id` AS `app_id`, `reviews`.`user_id` AS `user_id`, `reviews`.`content` AS `content`, `reviews`.`num_stars` AS `num_stars`, `reviews`.`review_date_time` AS `review_date_time`, `appointments`.`tutor_id` AS `tutor_id`, `foo`.`user_fname` AS `tutor_fname`, `foo`.`user_lname` AS `tutor_lname`, `courses`.`course_name` AS `course_name` FROM (((`reviews` join `appointments` on((`reviews`.`app_id` = `appointments`.`app_id`))) join `courses` on((`courses`.`course_id` = `appointments`.`course_id`))) join `user` `foo` on((`appointments`.`tutor_id` = `foo`.`user_id`)))  ;
 
 -- --------------------------------------------------------
 
@@ -396,6 +411,15 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 DROP TABLE IF EXISTS `user_cart`;
 
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `user_cart`  AS SELECT `cart`.`user_id` AS `user_id`, `cart`.`course_id` AS `course_id`, `courses`.`course_name` AS `course_name`, `courses`.`course_num` AS `course_num` FROM (`cart` join `courses` on((`cart`.`course_id` = `courses`.`course_id`)))  ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `user_courses_cart`
+--
+DROP TABLE IF EXISTS `user_courses_cart`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `user_courses_cart`  AS SELECT `user`.`user_id` AS `user_id`, `courses`.`course_id` AS `course_id`, `courses`.`course_name` AS `course_name`, `courses`.`course_num` AS `course_num`, `courses`.`course_desc` AS `course_desc`, `cart`.`cart_id` AS `cart_id` FROM ((`user` join `courses`) join `cart`) WHERE (`user`.`user_id` = `cart`.`user_id`) ORDER BY `user`.`user_id` ASC  ;
 
 -- --------------------------------------------------------
 
@@ -437,7 +461,8 @@ ALTER TABLE `cart`
 -- Indexes for table `courses`
 --
 ALTER TABLE `courses`
-  ADD PRIMARY KEY (`course_id`);
+  ADD PRIMARY KEY (`course_id`),
+  ADD KEY `course_num` (`course_num`);
 
 --
 -- Indexes for table `payment_info`
