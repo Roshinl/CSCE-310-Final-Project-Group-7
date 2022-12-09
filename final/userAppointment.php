@@ -155,7 +155,7 @@ table, th, td {
 <!-- DROPDOWN FOR UPDATING APPOINTMENTS --> 
 
 <h1> Update Your Appointment Here: </h1>
-<p> Select an Appointment to Update: </p> 
+<p1> Select an Appointment to Update: </p> 
 
 <form method="post" action="userAppointment.php">
 <select name="apptToUpdate">

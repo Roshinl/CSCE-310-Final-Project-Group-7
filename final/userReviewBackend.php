@@ -87,7 +87,7 @@ $payload = "SELECT review_id FROM reviews WHERE user_id = '".$_SESSION['user_id'
 $review_ids = mysqli_query($link, $payload);
 
 if (isset($_POST['delete_review_id'])) {
-	$to_delete_id = mysqli_real_escape_string($link, $_POST['select_review_id']);
+	$to_delete_id = mysqli_real_escape_string($link, $_POST['selected_review_id']);
 	
 	$payload = "DELETE FROM reviews WHERE review_id = '$to_delete_id'";
 	$execute = mysqli_query($link, $payload);
