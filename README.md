@@ -1,42 +1,64 @@
-# CSCE-310
-Group 7
+# Fall 2022 CSCE 310 - Database Systems
+Group 7: JP Bartsch, Roshin Lal, Harsha Siripurapu, Clinton Yau
 #
-login.php - Page for logging in
+General Pages
+- login.php - Page for logging in.
+- register.php - Page for registering account.
+- registerUser.php - Page for registering user (student/tutor/admin) account.
+- loginRegBackend.php - Backend code for login.php, register.php, registerUser.php
 
-register.php - Page for registering your account
+User Pages
+- userHomePage.php - Home page for user after logging in. From here, the user can navigate to edit their profile, set up appointments, sign up for courses, and give reviews.
+- userProfileEdit.php - Page that allows user to view/update their user account details, add/view/delete payment information, and delete their user account.
+- userProfileEditBackend.php - Backend code for userProfileEdit.php
+- userAppointment.php - Page that allows user to create/view/update/delete scheduled appointments.
+- userAppointmentBackend.php - Backend code for userAppointment.php
+- userCourses.php - Page that allows user to view/add/delete courses to cart.
+- userCoursesBackend.php - Backend code for userCourses.php
+- userCoursePayment.php - Page that allows user to make a payment to check out and view the courses they've selected.
+- userReview.php - Page that allows user to create/view/update/delete reviews.
+- userReviewBackend.php - Backend code for userReview.php
 
-loginRegBackend.php - Backend code for login.php and register.php
-
-userHomePage.php - Home page after logging in. From here, the user can navigate to edit their profile (set appointment, other pages in future)
-
-profileEdit.php - Page that allows user to edit their user account details as well as add payment information
-
-profileEditBackend.php - Backend code for profileEdit.php
-
-adminHomePage.php - Home page for admin. Ideally, login for admin takes them there. From here, admin can go to separate pages to deal with appointments, courses, etc.
-
-adminAppointment - Page that allows admin to view all appointments, create appointment between any user/tutor, delete, and update appointments
-
-adminAppointmentBackend - Backend code for adminAppointment.php
-
-userProfileEdit.php - Pages allows admin to edit a student/tutors profile; allows for adding/deleting payment information and account deletion.
-
-userProfileEditBackend - Backend code for userProfileEdit.php
+Admin Pages
+- adminHomePage.php - Home page for admin after logging in. From here, the admin can navigate to edit their profile, register a user account, update a user account profile, manage all appointments, manage all courses, and manage all reviews.
+- adminProfileEdit.php - Page that allows admin to view/update their user account details, and delete their user account.
+- adminProfileEditBackend.php - Backend code for adminProfileEdit.php
+- adminUserProfileEdit.php - Page that allows admin to view/update a user (student/tutors) profile details, add/delete user payment information, and delete a user's account.
+- adminUserProfileEditBackend.php - Backend code for adminUserProfileEdit.php
+- adminAppointment.php - Page that allows admin to view all student/tutors/courses, create an appointment between any student and tutor, and update/delete any appointments.
+- adminAppointmentBackend.php - Backend code for adminAppointment.php
+- adminCourses.php - Page that allows admin to create/view/update/delete courses.
+- adminCoursesBackend.php - Backend code for adminCourses.php
+- adminReview.php - Page that allows admin to create/view/update/delete reviews.
+- adminReviewBackend.php - Backend code for adminReview.php
 
 #
-Index/Views
+Index
+- Index on username
+    - Used by: Clinton Yau - Profile (User) and Scheduling (Admin)
+    - Used by: Roshin Lal - Profile (Admin)
+- Indexes on user’s first name and last name
+    - Used by: JP Bartsch - Reviews (Admin)
+- Indexes on course number
+    - Used by: Harsha Siripurapu - Reviews (User) and Courses (Admin)
 
-Clinton:
+Views
+- appointments_table_with_names - Joins the course, user, and appointments tables together
+    - Used by: Clinton Yau - Scheduling (Admin)
+- reviews_table_with_names - Joins review, appointment, course, and user tables together
+    - Used by: JP Bartsch - Reviews (Admin)
+    - Used by: Harsha Siripurapu - Reviews (User)
+- user_courses_cart - Joins user, courses, and cart tables together
+    - Used by: Harsha Siripurapu - Courses (admin)
+- user_table_with_paymentinfo - Joins user table with payment information
+    - Used by:  Roshin Lal - Profile (Admin)
 
-Index on username (many repeated queries with username attribute)
+#
+ERD Design Iteration 1 (INITIAL VERSION)
+![erd1-initial](G7_Tutoring/img/erd1-initial.png)
 
-View named appointments_table_with_names joins 3 tables for a complex query
+ERD Design Iteration 2 (FINAL VERSION)
+![erd2-final](G7_Tutoring/img/erd2-final.png)
 
-JP:
-
-View called reviews_table_with_names; seen on reviews page, joins appointment, course, and user tables to display tutor names, appointment ids, and their respective reviews with all necessary data
-
-Index on user's first name and last name
-
-Roshin:
-View called user_table_with_paymentinfo joins the payment_info table with the user table to show admins the student's payment information for adding/deleting payment methods.
+G7 Tutoring Landing Page
+![g7-tutoring-landing](G7_Tutoring/img/g7-tutoring-landing.png)
